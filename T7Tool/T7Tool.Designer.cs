@@ -77,6 +77,7 @@ namespace T7Tool
             this.applyPatchTabPage = new System.Windows.Forms.TabPage();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.getIDFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1.SuspendLayout();
             this.patchTabControl.SuspendLayout();
             this.fileInfoPage.SuspendLayout();
@@ -608,6 +609,10 @@ namespace T7Tool
             // 
             this.ToolTip.ToolTipTitle = "Tool tip";
             // 
+            // getIDFileDialog
+            // 
+            this.getIDFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.getIDFileDialog_FileOk);
+            // 
             // T7Tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -685,6 +690,7 @@ namespace T7Tool
         private System.Windows.Forms.Button openFileButton;
         private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Button saveFileAsbButton;
+        private System.Windows.Forms.OpenFileDialog getIDFileDialog;
     }
 }
 

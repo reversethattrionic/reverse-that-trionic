@@ -11,8 +11,6 @@ namespace T7Tool
         string m_immobilizerID;
         string m_softwareVersion;
         string m_carDescription;
-        bool m_firstRead = true;
-        bool m_firstWrite = true;
         long fileLength;
         int m_checksumF2;
         int m_checksumFB;
@@ -30,44 +28,50 @@ namespace T7Tool
             if (!File.Exists(a_filename))
                 return false;
             FileStream fs = new FileStream(a_filename, FileMode.Open, FileAccess.ReadWrite);
-            m_firstWrite = true;
-            m_firstRead = true;
-            FileStream tmpFs;
             FileHeaderField fhf;
             fs.Seek(0, SeekOrigin.End);
+            long writePos;
             fileLength = fs.Position;
             do
             {
-                tmpFs = fs;
+                writePos = fs.Position;
                 fhf = readField(fs);
                 switch (fhf.m_fieldID)
                 {
                     case 0x90:  setHeaderString(fhf, m_chassisID);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0x97:  setHeaderString(fhf, m_carDescription);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0x95:  setHeaderString(fhf, m_softwareVersion);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0x92:  setHeaderString(fhf, m_immobilizerID);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0xFB:  setHeaderIntValue(fhf, m_checksumFB);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0xF2:  setHeaderIntValue(fhf, m_checksumF2);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     case 0xFE:  setHeaderIntValue(fhf, m_fwLength);
-                                writeField(tmpFs, fhf);
+                                fs.Position = writePos;
+                                writeField(fs, fhf);
                                 break;
                     default:
                                 break;
                 }   
             }
             while (fhf.m_fieldID != 0xFF);
+            fs.Close();
             return true;
         }
 
@@ -76,7 +80,6 @@ namespace T7Tool
             if (!File.Exists(a_filename)) 
                 return false;
             FileStream fs = new FileStream(a_filename, FileMode.Open, FileAccess.Read);
-            m_firstRead = true;
             FileHeaderField fhf;
             fs.Seek(0, SeekOrigin.End);
             fileLength = fs.Position;
@@ -104,6 +107,7 @@ namespace T7Tool
                 }
             }
             while (fhf.m_fieldID != 0xFF);
+            fs.Close();
             return true;
         }
 
@@ -136,25 +140,19 @@ namespace T7Tool
 
         private void setHeaderIntValue(FileHeaderField a_fileHeaderField, int a_value)
         {
-            a_fileHeaderField.m_data[0] = (byte) a_value;
-            a_value >>= 8;
-            a_fileHeaderField.m_data[1] = (byte) a_value;
+            a_fileHeaderField.m_data[3] = (byte) a_value;
             a_value >>= 8;
             a_fileHeaderField.m_data[2] = (byte) a_value;
             a_value >>= 8;
-            a_fileHeaderField.m_data[3] = (byte) a_value;
+            a_fileHeaderField.m_data[1] = (byte) a_value;
+            a_value >>= 8;
+            a_fileHeaderField.m_data[0] = (byte) a_value;
         }
 
         private FileHeaderField readField(FileStream a_fileStream)
         {
             FileHeaderField fhf = new FileHeaderField();
-            if (m_firstRead)
-            {
-                a_fileStream.Position -= 1;
-                m_firstRead = false;
-            }
-            else
-                a_fileStream.Position -= 2;
+            a_fileStream.Position -= 1;
             fhf.m_fieldLength = (byte) a_fileStream.ReadByte();
             a_fileStream.Position -= 2;
             fhf.m_fieldID = (byte) a_fileStream.ReadByte();
@@ -166,6 +164,7 @@ namespace T7Tool
                 fhf.m_data[i] = (byte)a_fileStream.ReadByte();
 
             }
+            a_fileStream.Position -= 1;
             return fhf;
         }
 
@@ -174,10 +173,11 @@ namespace T7Tool
             a_fileStream.Position -= 3;         // Skip ID and length
             for (int i = 0; i < a_fhf.m_fieldLength; i++)
             {
-                a_fileStream.Position -= 2;
                 a_fileStream.WriteByte(a_fhf.m_data[i]);
+                a_fileStream.Position -= 2;
 
             }
+            a_fileStream.Position += 1;
         }
 
         public string getChassisID()
