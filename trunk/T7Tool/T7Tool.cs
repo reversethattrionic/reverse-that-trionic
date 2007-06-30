@@ -39,7 +39,16 @@ namespace T7Tool
             firmwareLengthTextBox.Text = "0x" + t7InfoHeader.getFWLength().ToString("X");
 
             ChecksumHandler csHandler = new ChecksumHandler();
-            checksumFWTextBox.Text = "0x" + csHandler.getFWChecksum(m_fileName).ToString("X");
+            int fwChecksum = csHandler.getFWChecksum(m_fileName);
+            checksumFWTextBox.Text = "0x" + fwChecksum.ToString("X");
+
+            int calculatedFWChecksum = csHandler.calculateFWChecksum(m_fileName);
+
+            if(fwChecksum == calculatedFWChecksum)
+                checksumFWTextBox.BackColor = Color.LightGreen;
+            else
+                checksumFWTextBox.BackColor = Color.Red;
+
              
         }
 
