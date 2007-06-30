@@ -37,6 +37,9 @@ namespace T7Tool
             checksumF2TextBox.Text = "0x" + t7InfoHeader.getChecksumF2().ToString("X");
             checksumFBTextBox.Text = "0x" + t7InfoHeader.getChecksumFB().ToString("X");
             firmwareLengthTextBox.Text = "0x" + t7InfoHeader.getFWLength().ToString("X");
+
+            ChecksumHandler csHandler = new ChecksumHandler();
+            checksumFWTextBox.Text = "0x" + csHandler.getFWChecksum(m_fileName).ToString("X");
              
         }
 
@@ -87,5 +90,22 @@ namespace T7Tool
 
         T7FileHeader t7InfoHeader = new T7FileHeader();
         string m_fileName;
+
+        private void saveFileAsbButton_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.ShowDialog();
+        }
+
+        private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            string fileName = saveFileDialog.FileName;
+            File.Copy(m_fileName, fileName, true);
+            t7InfoHeader.save(fileName);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }

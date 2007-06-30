@@ -26,7 +26,7 @@ namespace T7Tool
         public bool save(string a_filename)
         {
             if (!File.Exists(a_filename))
-                return false;
+                File.Create(a_filename);
             FileStream fs = new FileStream(a_filename, FileMode.Open, FileAccess.ReadWrite);
             FileHeaderField fhf;
             fs.Seek(0, SeekOrigin.End);

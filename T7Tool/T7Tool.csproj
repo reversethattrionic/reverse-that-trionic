@@ -36,6 +36,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChecksumHandler.cs" />
     <Compile Include="T7FileHeader.cs" />
     <Compile Include="T7Tool.cs">
       <SubType>Form</SubType>
