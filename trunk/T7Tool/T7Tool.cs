@@ -44,7 +44,7 @@ namespace T7Tool
 
         private void getIDButton_Click(object sender, EventArgs e)
         {
-
+            getIDFileDialog.ShowDialog();
         }
 
   
@@ -54,8 +54,6 @@ namespace T7Tool
             openFileDialog.ShowDialog();
         }
 
-        T7FileHeader t7InfoHeader = new T7FileHeader();
-        string m_fileName;
 
         private void imobilizerTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -76,5 +74,18 @@ namespace T7Tool
         {
             t7InfoHeader.save(m_fileName);
         }
+
+        private void getIDFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            string fileName = getIDFileDialog.FileName;
+            T7FileHeader fileHeader = new T7FileHeader();
+            fileHeader.init(fileName);
+            chassisIDTextBox.Text = fileHeader.getChassisID();
+            imobilizerTextBox.Text = fileHeader.getImmobilizerID();
+
+        }
+
+        T7FileHeader t7InfoHeader = new T7FileHeader();
+        string m_fileName;
     }
 }
