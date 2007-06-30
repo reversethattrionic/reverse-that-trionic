@@ -78,6 +78,7 @@ namespace T7Tool
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.getIDFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuStrip1.SuspendLayout();
             this.patchTabControl.SuspendLayout();
             this.fileInfoPage.SuspendLayout();
@@ -108,8 +109,9 @@ namespace T7Tool
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // patchTabControl
             // 
@@ -157,6 +159,7 @@ namespace T7Tool
             this.saveFileAsbButton.TabIndex = 9;
             this.saveFileAsbButton.Text = "Save as...";
             this.saveFileAsbButton.UseVisualStyleBackColor = true;
+            this.saveFileAsbButton.Click += new System.EventHandler(this.saveFileAsbButton_Click);
             // 
             // saveFileButton
             // 
@@ -613,6 +616,11 @@ namespace T7Tool
             // 
             this.getIDFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.getIDFileDialog_FileOk);
             // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.AddExtension = false;
+            this.saveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
+            // 
             // T7Tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -691,6 +699,7 @@ namespace T7Tool
         private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Button saveFileAsbButton;
         private System.Windows.Forms.OpenFileDialog getIDFileDialog;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }
 
