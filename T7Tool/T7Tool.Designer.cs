@@ -109,7 +109,7 @@ namespace T7Tool
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -305,9 +305,9 @@ namespace T7Tool
             this.asdfasdf.AutoSize = true;
             this.asdfasdf.Location = new System.Drawing.Point(3, 6);
             this.asdfasdf.Name = "asdfasdf";
-            this.asdfasdf.Size = new System.Drawing.Size(57, 13);
+            this.asdfasdf.Size = new System.Drawing.Size(84, 13);
             this.asdfasdf.TabIndex = 7;
-            this.asdfasdf.Text = "Chassis ID";
+            this.asdfasdf.Text = "Chassis ID (VIN)";
             // 
             // imobilizerTextBox
             // 
