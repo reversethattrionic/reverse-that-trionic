@@ -225,6 +225,16 @@ namespace T7Tool
             return m_checksumF2;
         }
 
+        public void setChecksumF2(int a_checksum)
+        {
+            m_checksumF2 = a_checksum;
+        }
+
+        public void setChecksumFB(int a_checksum)
+        {
+            m_checksumFB = a_checksum;
+        }
+
         public int getChecksumFB()
         {
             return m_checksumFB;

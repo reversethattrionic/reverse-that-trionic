@@ -79,6 +79,8 @@ namespace T7Tool
             this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.getIDFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutT7ToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.patchTabControl.SuspendLayout();
             this.fileInfoPage.SuspendLayout();
@@ -91,7 +93,8 @@ namespace T7Tool
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(436, 24);
@@ -190,6 +193,7 @@ namespace T7Tool
             this.fixChecksumButton.Text = "Fix checksums";
             this.ToolTip.SetToolTip(this.fixChecksumButton, "Correct checksums");
             this.fixChecksumButton.UseVisualStyleBackColor = true;
+            this.fixChecksumButton.Click += new System.EventHandler(this.fixChecksumButton_Click);
             // 
             // getIDButton
             // 
@@ -621,6 +625,21 @@ namespace T7Tool
             this.saveFileDialog.AddExtension = false;
             this.saveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
             // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutT7ToolToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutT7ToolToolStripMenuItem
+            // 
+            this.aboutT7ToolToolStripMenuItem.Name = "aboutT7ToolToolStripMenuItem";
+            this.aboutT7ToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutT7ToolToolStripMenuItem.Text = "About T7Tool";
+            this.aboutT7ToolToolStripMenuItem.Click += new System.EventHandler(this.aboutT7ToolToolStripMenuItem_Click);
+            // 
             // T7Tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -700,6 +719,8 @@ namespace T7Tool
         private System.Windows.Forms.Button saveFileAsbButton;
         private System.Windows.Forms.OpenFileDialog getIDFileDialog;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutT7ToolToolStripMenuItem;
     }
 }
 
