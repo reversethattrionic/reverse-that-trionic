@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("T7Tool")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Calculates checksums and edits identifiers for T7 FW. Remember to always backup your binaries before using T7Tool on them. T7Tool is free use it as you want. Contact the author at patrik.servin@gmail.com if you should encounter a bug.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Author: Patrik Servin")]
 [assembly: AssemblyProduct("T7Tool")]
-[assembly: AssemblyCopyright("Copyright ©  2007")]
+[assembly: AssemblyCopyright("Copyright: Free")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
