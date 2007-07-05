@@ -7,10 +7,10 @@ namespace T7Tool
 {
     class T7FileHeader
     {
-        string m_chassisID;
-        string m_immobilizerID;
-        string m_softwareVersion;
-        string m_carDescription;
+        string m_chassisID = "";
+        string m_immobilizerID = "";
+        string m_softwareVersion = "";
+        string m_carDescription = "";
         long fileLength;
         int m_checksumF2;
         int m_checksumFB;
@@ -70,13 +70,20 @@ namespace T7Tool
                                 break;
                 }   
             }
-            while (fhf.m_fieldID != 0xFF);
+            while (fhf.m_fieldID != 0xFF && fhf.m_fieldID != 0xF9 );    // Don't write past 0xF9 "End of header"
             fs.Close();
             return true;
         }
 
         public bool init(string a_filename)
         {
+            m_checksumF2 = 0;
+            m_checksumFB = 0;
+            m_chassisID = "";
+            m_immobilizerID = "";
+            m_softwareVersion = "";
+            m_carDescription = "";
+
             if (!File.Exists(a_filename)) 
                 return false;
             FileStream fs = new FileStream(a_filename, FileMode.Open, FileAccess.Read);
@@ -106,7 +113,7 @@ namespace T7Tool
                         break;
                 }
             }
-            while (fhf.m_fieldID != 0xFF);
+            while (fhf.m_fieldID != 0xFF && fhf.m_fieldID != 0xF9 );    // Don't read past 0xF9 "End of header"
             fs.Close();
             return true;
         }

@@ -122,7 +122,16 @@ namespace T7Tool
             softwareVersionTextBox.Text = t7InfoHeader.getSoftwareVersion();
             carDescriptionTextBox.Text = t7InfoHeader.getCarDescription();
             imobilizerTextBox.Text = t7InfoHeader.getImmobilizerID();
-            checksumF2TextBox.Text = "0x" + t7InfoHeader.getChecksumF2().ToString("X");
+            if (t7InfoHeader.getChecksumF2() != 0)
+            {
+                checksumF2TextBox.Enabled = true;
+                checksumF2TextBox.Text = "0x" + t7InfoHeader.getChecksumF2().ToString("X");
+            }
+            else
+            {
+                checksumF2TextBox.Enabled = false;
+                checksumF2TextBox.Text = "";
+            }
             checksumFBTextBox.Text = "0x" + t7InfoHeader.getChecksumFB().ToString("X");
             firmwareLengthTextBox.Text = "0x" + t7InfoHeader.getFWLength().ToString("X");
 
@@ -140,23 +149,32 @@ namespace T7Tool
             if (fwChecksum == calculatedFWChecksum)
                 checksumFWTextBox.BackColor = Color.LightGreen;
             else
-                checksumFWTextBox.BackColor = Color.Red;
+                checksumFWTextBox.BackColor = Color.Salmon;
 
-            if (calculatedF2Checksum == f2Checksum)
+            if (t7InfoHeader.getChecksumF2() == 0)
+                checksumF2TextBox.BackColor = Color.Empty;
+            else if (calculatedF2Checksum == f2Checksum)
                 checksumF2TextBox.BackColor = Color.LightGreen;
             else
-                checksumF2TextBox.BackColor = Color.Red;
+                checksumF2TextBox.BackColor = Color.Salmon;
 
-            if (calculatedFBChecksum == fbChecksum)
+            if (t7InfoHeader.getChecksumFB() == 0)
+                checksumFBTextBox.BackColor = Color.Empty;
+            else if (calculatedFBChecksum == fbChecksum)
                 checksumFBTextBox.BackColor = Color.LightGreen;
             else
-                checksumFBTextBox.BackColor = Color.Red;
+                checksumFBTextBox.BackColor = Color.Salmon;
         }
 
         private void aboutT7ToolToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutBox aboutBox = new AboutBox();
             aboutBox.ShowDialog();
+        }
+
+        private void fileInfoPage_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
