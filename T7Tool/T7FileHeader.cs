@@ -20,7 +20,7 @@ namespace T7Tool
         {
             public byte m_fieldID;
             public byte m_fieldLength;
-            public byte[] m_data = new byte[32];
+            public byte[] m_data = new byte[255];
         }
 
         public bool save(string a_filename)
