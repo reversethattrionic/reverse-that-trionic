@@ -12,7 +12,7 @@ VEC_TAB	DS.L	NUM_VEC	Exception vector
 FILE	DS.L	1	DOS - File handle
 Start_Msg	DC.B	'Dumping T7 flash',13,10,0
 
-FMODE	DC.B	'w',0	Write privileges for file
+FMODE	DC.B	'wb',0	Write privileges for file
 	DS.W	0
 
 
