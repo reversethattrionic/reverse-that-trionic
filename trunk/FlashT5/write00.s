@@ -29,30 +29,30 @@ INIT_VEC	 MOVE.L	A2,A1+
 	MOVEQ	#BD_PUTS,D0	function call
 	BGND
 
-	LEA.L		$0,A0
-	MOVE.L	#$19,D5
-	MOVE.L	#1000,D2
+	LEA.L		$70000,A0
+	MOVE.L	#$19,D5		PLSCNT
+	MOVE.L	#200,D2		Delay
 	MOVE.L	#0,D6
 
-	CMP.L		#0,(A0)
-	BEQ		NEXT_ADDR
+		
+
 	
-WRITE_00	
-	MOVE.W	#$4040,0x0		Program setup
-	MOVE.B	#0,(A0)		Write 00
-	MOVE.L	D2,D4		
-	
+
+WRITE_00		
+	MOVE.W	#$4040,(A0)		Program setup
+	MOVE.W	#$0,(A0)		Write 0x0
+	MOVE.L	D2,D4
+
 WAIT1
 	SUBQ.L	#1,D4
 	BCC		WAIT1
 
-	MOVE.W	#$C0C0,0x0		Program 
+	MOVE.W	#$C0C0,(A0)		Program 
 	MOVE.L	D2,D4
 WAIT2
 	SUBQ.L	#1,D4
 	BCC		WAIT2
-
-	CMP.B		#0,(A0)		Verify
+	CMP.W		#0,(A0)		Verify
 	BEQ		NEXT_ADDR
 
 	MOVE.B	#$2F,D1		Print / if PLSCNT (D5) need to be incremented.
@@ -64,10 +64,10 @@ WAIT2
 	BNE		WRITE_00
 	BRA		DEVICE_FAILED
 
-NEXT_ADDR				
+NEXT_ADDR			
 	MOVE.L	#$19,D5		Erase next address
-	ADD.L		#1,A0
-	ADD.L		#1,D6
+	ADD.L		#2,A0
+	ADD.L		#2,D6
 	CMP.L		#1024,D6
 	BNE		NEXT_ADDR2
 	MOVE.B	#$2E,D1		Print a dot for each kB.
@@ -75,26 +75,34 @@ NEXT_ADDR
 	BGND	
 	MOVE		#1,D6
 NEXT_ADDR2
-	CMP.L		#$4000,A0
-	BEQ		RESET		
+	CMP.L		#$70020,A0
+	BEQ		RESET	
+
+	MOVE.B	#$2E,D1	
+	MOVEQ	#BD_PUTCHAR,D0
+	BGND
+	
 	BRA		WRITE_00
 
 
-RESET						 
-	MOVE.B	#$FFFF,0x0		Erase is completed. Time to reset flash.
-	MOVE.B	#$FFFF,0x0
+RESET				
+	MOVE.W	#$FFFF,$70000		Erase is completed. Time to reset flash.
+	MOVE.W	#$FFFF,$70000
 	BRA		THE_END
 	
 
-DEVICE_FAILED MOVEQ	#1,D7	Exception aufgetreten
+DEVICE_FAILED
+      MOVEQ	#1,D7	Exception aufgetreten
 	BRA	THE_END
 
-EXCEPT_ERR	MOVEQ	#1,D7	Exception aufgetreten
+EXCEPT_ERR	
+	MOVEQ	#1,D7	Exception aufgetreten
 	BRA	THE_END
 
 EXCEPT	BRA	EXCEPT_ERR	nur Fehlermeldung ausgeben
 
 THE_END
+
 	
 * Ende des Programms
 	DS.W	100	Stack ist 100 Worte gro§
