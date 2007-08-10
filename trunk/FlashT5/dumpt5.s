@@ -10,7 +10,7 @@ NUM_VEC	EQU	40	Exception vector
 START	DC.L	PROG_START	
 VEC_TAB	DS.L	NUM_VEC	Exception vector
 FILE	DS.L	1	DOS - File handle
-Start_Msg	DC.B	'Dumping T7 flash',13,10,0
+Start_Msg	DC.B	'Dumping T5 flash',13,10,0
 
 FMODE	DC.B	'wb',0	Write privileges for file
 	DS.W	0
@@ -52,16 +52,17 @@ PAR_OK	MOVE.L	(4,A6),A0	Pointer to file name
 
 * Dump flash to file
 	MOVE.L #0,D7
+	LEA.L	$40000,A0 Address to copy from 
 READ_WRITE
 	MOVE.L   (FILE,A5),D1     File handle
-	MOVE.L   #$FF,D2       Number of bytes to copy
-	LEA.L	(0),A0 Address to copy from 
+	MOVE.L   #256,D2       Number of bytes to copy
 	MOVEQ #BD_FWRITE,D0
 	BGND
 	MOVE.B	#$2E,D1
 	MOVEQ	#BD_PUTCHAR,D0
 	BGND
 	ADD   #1,D7
+	ADD.W	#256,A0
 	CMP.W	#1024,D7
 	BGE PROG_END
 	BRA READ_WRITE
