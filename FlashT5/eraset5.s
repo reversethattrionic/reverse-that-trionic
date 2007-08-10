@@ -32,35 +32,48 @@ INIT_VEC	 MOVE.L	A2,A1+
 	MOVEQ	#BD_PUTS,D0	function call
 	BGND
 
-	LEA.L		0,A0
+	LEA.L		$70000,A0
 	MOVE.L	#$19,D5
-	MOVE.L	#2,D2
+	MOVE.L	#200,D2
 	MOVE.L	#0,D6
 	
 ERASE
-
-	MOVE.W	#$2020,0x0		Erase setup
-	MOVE.W	#$2020,0x0		Erase write
+	MOVE.W	#$2020,(A0)		Erase setup
+	MOVE.W	#$2020,(A0)		Erase write
 	MOVE.L	D2,D4
-	MULU.L	#$3E8,D4		
-WAIT3
-	SUBQ.L	#1,D4
-	CMP.L		#0,D4
-	BNE.L		WAIT3
 
-	MOVE.W	#$A0A0,0x0		Erase
+
+
+
+	MULU.L	#$3E8,D4	
+
+	MOVE.B	#$2E,D1	
+	MOVEQ	#BD_PUTCHAR,D0
+	BGND
+
+WAIT3
+
+	
+
+	SUB.L		#1,D4
+	CMP.L		#0,D4
+	BNE		WAIT3
+
+
+
+	MOVE.W	#$A0A0,(A0)		Erase
 	MOVE.L	D2,D4
 WAIT4
 	SUBQ.L	#1,D4
 	CMP.L		#0,D4
 	BNE.L		WAIT4
 
-	CMP.B		#$FF,(A0)		Verify
-	BEQ		NEXT_ADDR
-
 	MOVE.B	#$2F,D1		Print / if PLSCNT is incremented
 	MOVEQ	#BD_PUTCHAR,D0
 	BGND
+
+	CMP.W		#$FFFF,(A0)		Verify
+	BEQ		NEXT_ADDR
 
 	SUB.L		#1,D5
 	CMP.L		#0,D5
@@ -68,7 +81,7 @@ WAIT4
 	BRA 		ERASE
 
 NEXT_ADDR
-	ADD.L		#1,D6				Erase next address
+	ADD.L		#2,D6				Erase next address
 	CMP		#1024,D6
 	BNE		NEXT_ADDR2
 	MOVE.B	#$2E,D1			Print a dot for every kB
@@ -76,8 +89,8 @@ NEXT_ADDR
 	BGND
 	MOVE.L	#0,D6
 NEXT_ADDR2
-	ADD.L		#1,A0
-	CMP.L		#$40000,A0
+	ADD.L		#2,A0
+	CMP.L		#$70020,A0
 	BEQ		RESET
 	MOVE.L	#$19,D5
 	BRA 		ERASE
@@ -86,15 +99,15 @@ NEXT_ADDR2
 
 
 RESET
-	MOVE.B	#$FFFF,0x0	
-	MOVE.B	#$FFFF,0x0
+	MOVE.B	#$FFFF,$70000	
+	MOVE.B	#$FFFF,$70000
 	BRA		THE_END
 	
 
 DEVICE_FAILED MOVEQ	#1,D7	
-	MOVE.L	#$4040,(A0)
-	MOVE.L	#$FFFF,(A0)	
-	MOVE.L	#$FFFF,(A0)
+	MOVE.L	#$4040,$70000
+	MOVE.L	#$FFFF,$70000
+	MOVE.L	#$FFFF,$70000
 	BRA	THE_END
 
 EXCEPT_ERR	MOVEQ	#1,D7	
