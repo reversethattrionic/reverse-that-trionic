@@ -6,11 +6,13 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using T7Tool.KWP;
 
 namespace T7Tool
 {
     public partial class T7Tool : Form
     {
+
         public T7Tool()
         {
             InitializeComponent();
@@ -75,8 +77,6 @@ namespace T7Tool
 
         }
 
-        T7FileHeader t7InfoHeader = new T7FileHeader();
-        string m_fileName;
 
         private void saveFileAsbButton_Click(object sender, EventArgs e)
         {
@@ -176,5 +176,42 @@ namespace T7Tool
         {
 
         }
+
+        private void kwpDeviceOpenButton_Click(object sender, EventArgs e)
+        {
+            kwpDeviceConnectionStatus.Text = "Connecting";
+            if (kwpDeviceComboBox.SelectedItem.ToString() == "Lawicel CANUSB")
+                kwpHandler.setKWPDevice(canUsbDevice);
+            if (kwpHandler.openKWPDevice())
+                kwpDeviceConnectionStatus.Text = "Open";
+            else
+            {
+                kwpDeviceConnectionStatus.Text = "Unable to open";
+                kwpHandler.closeKWPDevice();
+                return;
+            }
+            if (kwpHandler.startSession())
+                kwpDeviceConnectionStatus.Text = "Connected";
+            else
+            {
+                kwpDeviceConnectionStatus.Text = "Initialize error";
+                kwpHandler.closeKWPDevice();
+                return;
+            }
+            string vin;
+            KWPResult res = kwpHandler.getVIN(out vin);
+            if (res == KWPResult.OK)
+                ecuVINTextBox.Text = vin;
+            else if (res == KWPResult.DeviceNotConnected)
+                ecuVINTextBox.Text = "Not connected";
+            else
+                ecuVINTextBox.Text = "Timeout";
+
+        }
+
+        T7FileHeader t7InfoHeader = new T7FileHeader();
+        static CANUSBDevice canUsbDevice = new CANUSBDevice();
+        static KWPHandler kwpHandler = new KWPHandler();
+        string m_fileName;
     }
 }

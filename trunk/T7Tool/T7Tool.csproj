@@ -60,6 +60,12 @@
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
     <Compile Include="ChecksumHandler.cs" />
+    <Compile Include="KWP\CANUSBDevice.cs" />
+    <Compile Include="KWP\IKWPDevice.cs" />
+    <Compile Include="KWP\KWPHandler.cs" />
+    <Compile Include="KWP\KWPReply.cs" />
+    <Compile Include="KWP\KWPRequest.cs" />
+    <Compile Include="CAN\Lawicel_canusb.cs" />
     <Compile Include="T7FileHeader.cs" />
     <Compile Include="T7Tool.cs">
       <SubType>Form</SubType>
