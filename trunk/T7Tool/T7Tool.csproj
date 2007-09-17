@@ -59,9 +59,14 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="CAN\ICANListener.cs" />
+    <Compile Include="CAN\CANMessage.cs" />
+    <Compile Include="CAN\ICANDevice.cs" />
     <Compile Include="ChecksumHandler.cs" />
-    <Compile Include="KWP\CANUSBDevice.cs" />
+    <Compile Include="CAN\CANUSBDevice.cs" />
+    <Compile Include="KWP\KWPCANDevice.cs" />
     <Compile Include="KWP\IKWPDevice.cs" />
+    <Compile Include="KWP\KWPCANListener.cs" />
     <Compile Include="KWP\KWPHandler.cs" />
     <Compile Include="KWP\KWPReply.cs" />
     <Compile Include="KWP\KWPRequest.cs" />
