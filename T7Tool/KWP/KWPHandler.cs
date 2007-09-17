@@ -29,37 +29,81 @@ namespace T7Tool.KWP
             m_kwpDevice = a_device;
         }
 
-        public bool openKWPDevice()
-        {
-            if (m_kwpDevice.open() == OpenResult.OK)
-                return true;
-            else
-                return false;
-        }
-
         public bool startSession()
         {
             return m_kwpDevice.startSession();
         }
 
-        public bool closeKWPDevice()
+        public bool openDevice()
         {
-            if (m_kwpDevice.close() == CloseResult.OK)
-                return true;
-            else
-                return false;
+            return m_kwpDevice.open();
         }
+
+        public bool closeDevice()
+        {
+            return m_kwpDevice.close();
+        }
+
 
         public KWPResult getVIN(out string r_vin)
         {
-            r_vin = "MYSAAB";
-            KWPRequest request = new KWPRequest(0x1A,0x90);
             KWPReply reply = new KWPReply();
-            if (!m_kwpDevice.isOpen())
-                return KWPResult.DeviceNotConnected;
-            m_kwpDevice.sendRequest(request, out reply);
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x1A,0x90), out reply);
             r_vin = getString(reply);
             return KWPResult.OK;
+        }
+
+        public KWPResult getImmo(out string r_immo)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x1A, 0x92), out reply);
+            r_immo = getString(reply);
+            return result;
+        }
+
+        public KWPResult getSwPartNumber(out string r_swPartNo)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x1A, 0x94), out reply);
+            r_swPartNo = getString(reply);
+            return result;
+        }
+
+        public KWPResult getSwVersion(out string r_swVersion)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x1A, 0x95), out reply);
+            r_swVersion = getString(reply);
+            return result;
+        }
+
+        public KWPResult getEngineType(out string r_swVersion)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x1A, 0x97), out reply);
+            r_swVersion = getString(reply);
+            return result;
+        }
+
+
+        private KWPResult sendRequest(KWPRequest a_request, out KWPReply a_reply)
+        {
+            KWPReply reply = new KWPReply();
+            RequestResult result;
+            a_reply = new KWPReply();
+            if (!m_kwpDevice.isOpen())
+                return KWPResult.DeviceNotConnected;
+            result = m_kwpDevice.sendRequest(a_request, out reply);
+            a_reply = reply;
+            if (result == RequestResult.NoError)
+                return KWPResult.OK;
+            else
+                return KWPResult.Timeout;
         }
 
         private string getString(KWPReply a_reply)

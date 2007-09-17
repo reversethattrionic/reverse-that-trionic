@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using T7Tool.KWP;
+using T7Tool.CAN;
 
 namespace T7Tool
 {
@@ -181,13 +182,16 @@ namespace T7Tool
         {
             kwpDeviceConnectionStatus.Text = "Connecting";
             if (kwpDeviceComboBox.SelectedItem.ToString() == "Lawicel CANUSB")
-                kwpHandler.setKWPDevice(canUsbDevice);
-            if (kwpHandler.openKWPDevice())
+            {
+                kwpCanDevice.setCANDevice(canUsbDevice);
+                kwpHandler.setKWPDevice(kwpCanDevice);
+            }
+            if (kwpHandler.openDevice())
                 kwpDeviceConnectionStatus.Text = "Open";
             else
             {
                 kwpDeviceConnectionStatus.Text = "Unable to open";
-                kwpHandler.closeKWPDevice();
+                kwpHandler.closeDevice();
                 return;
             }
             if (kwpHandler.startSession())
@@ -195,10 +199,13 @@ namespace T7Tool
             else
             {
                 kwpDeviceConnectionStatus.Text = "Initialize error";
-                kwpHandler.closeKWPDevice();
+                kwpHandler.closeDevice();
                 return;
             }
             string vin;
+            string immo;
+            string engineType;
+            string swVersion;
             KWPResult res = kwpHandler.getVIN(out vin);
             if (res == KWPResult.OK)
                 ecuVINTextBox.Text = vin;
@@ -207,10 +214,21 @@ namespace T7Tool
             else
                 ecuVINTextBox.Text = "Timeout";
 
+            res = kwpHandler.getImmo(out immo);
+            if (res == KWPResult.OK)
+                ecuImmoTextBox.Text = immo;
+            res = kwpHandler.getEngineType(out engineType);
+            if (res == KWPResult.OK)
+                ecuCarDescTextBox.Text = engineType;
+            res = kwpHandler.getEngineType(out swVersion);
+            if (res == KWPResult.OK)
+                ecuSWVerTextBox.Text = swVersion;
+
         }
 
         T7FileHeader t7InfoHeader = new T7FileHeader();
         static CANUSBDevice canUsbDevice = new CANUSBDevice();
+        static KWPCANDevice kwpCanDevice = new KWPCANDevice();
         static KWPHandler kwpHandler = new KWPHandler();
         string m_fileName;
     }

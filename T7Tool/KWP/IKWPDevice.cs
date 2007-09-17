@@ -14,24 +14,12 @@ namespace T7Tool.KWP
     } 
 
 
-    public enum OpenResult
-    {
-        OK,
-        OpenError
-    }
-
-    public enum CloseResult
-    {
-        OK,
-        CloseError
-    }
-
     interface IKWPDevice
     {
-        OpenResult open();
-        CloseResult close();
-        bool isOpen();
         bool startSession();
         RequestResult sendRequest(KWPRequest a_request, out KWPReply r_reply);
+        bool open();
+        bool close();
+        bool isOpen();
     }
 }
