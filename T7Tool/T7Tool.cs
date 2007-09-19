@@ -223,6 +223,10 @@ namespace T7Tool
             res = kwpHandler.getEngineType(out swVersion);
             if (res == KWPResult.OK)
                 ecuSWVerTextBox.Text = swVersion;
+            if(kwpHandler.requestSequrityAccess())
+                ecuCSF2TextBox.Text = "Got S.A";
+            else
+                ecuCSF2TextBox.Text = "Didn't get S.A.";
 
         }
 
