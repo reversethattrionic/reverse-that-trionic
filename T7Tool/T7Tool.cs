@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using System.IO;
 using T7Tool.KWP;
 using T7Tool.CAN;
+using T7Tool.Flasher;
+using System.Threading;
 
 namespace T7Tool
 {
@@ -17,6 +19,11 @@ namespace T7Tool
         public T7Tool()
         {
             InitializeComponent();
+            timerDelegate = new TimerCallback(this.flasherInfo);
+            stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 1000, 250);
+            flashWriteButton.Enabled = false;
+            flashDownLoadButton.Select();
+            flashStartButton.Enabled = false;
         }
 
 
@@ -176,6 +183,27 @@ namespace T7Tool
         private void fileInfoPage_Click(object sender, EventArgs e)
         {
 
+
+        }
+            
+
+        public void flasherInfo(Object stateInfo)
+        {
+            Control.CheckForIllegalCrossThreadCalls = false;
+            flashNrOfBytesLabel.Text = "" + m_t7Flasher.getNrOfBytesRead() / 1024;
+            switch (m_t7Flasher.getStatus())
+            {
+                case T7Flasher.FlashStatus.Completed: flashStatusLabel.Text = "Completed"; break;
+                case T7Flasher.FlashStatus.Reading:
+                    {
+                        flashStartButton.Text = "Stop";
+                        flashStatusLabel.Text = "Reading";
+                        break;
+                    }
+                case T7Flasher.FlashStatus.Writing: flashStatusLabel.Text = "Writing"; break;
+                case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No sequrity access"; break;
+                case T7Flasher.FlashStatus.DoinNuthin: flashStatusLabel.Text = "Not started"; break;
+            }
         }
 
         private void kwpDeviceOpenButton_Click(object sender, EventArgs e)
@@ -220,13 +248,11 @@ namespace T7Tool
             res = kwpHandler.getEngineType(out engineType);
             if (res == KWPResult.OK)
                 ecuCarDescTextBox.Text = engineType;
-            res = kwpHandler.getEngineType(out swVersion);
+            res = kwpHandler.getSwVersion(out swVersion);
             if (res == KWPResult.OK)
                 ecuSWVerTextBox.Text = swVersion;
-            if(kwpHandler.requestSequrityAccess())
-                ecuCSF2TextBox.Text = "Got S.A";
-            else
-                ecuCSF2TextBox.Text = "Didn't get S.A.";
+            flashStartButton.Enabled = true;
+            
 
         }
 
@@ -234,6 +260,34 @@ namespace T7Tool
         static CANUSBDevice canUsbDevice = new CANUSBDevice();
         static KWPCANDevice kwpCanDevice = new KWPCANDevice();
         static KWPHandler kwpHandler = new KWPHandler();
+        T7Flasher m_t7Flasher = new T7Flasher(kwpHandler);
         string m_fileName;
+        TimerCallback timerDelegate;
+        System.Threading.Timer stateTimer;
+
+        private void flashStartButton_Click(object sender, EventArgs e)
+        {
+            if (flashStartButton.Text == "Stop")
+            {
+                m_t7Flasher.stopFlasher();
+                flashFileNameLabel.Text = "";
+                flashStartButton.Text = "Start";
+            }
+            else
+            {
+                flashFileDialog.FileName = ecuSWVerTextBox.Text + ".bin";
+                flashFileDialog.ShowDialog();
+            }
+        }
+
+        private void flashFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
+            m_t7Flasher.readFlash(flashFileDialog.FileName);
+            flashFileNameLabel.Text = Path.GetFileName(flashFileDialog.FileName);
+
+        }
+
+
     }
 }

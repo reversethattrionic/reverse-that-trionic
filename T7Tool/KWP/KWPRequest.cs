@@ -45,7 +45,7 @@ namespace T7Tool.KWP
             m_request[i++] = a_mode;
             m_request[i++] = a_pidHigh;
             m_request[i++] = a_pidLow;
-            for (int j = 0; i < length; i++, j++)
+            for (int j = 0; i < m_request.Length; i++, j++)
                 m_request[i] = a_data[j];
             m_nrOfPid = 2;
         }
