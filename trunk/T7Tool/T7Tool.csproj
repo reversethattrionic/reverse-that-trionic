@@ -72,6 +72,7 @@
     <Compile Include="KWP\KWPRequest.cs" />
     <Compile Include="CAN\Lawicel_canusb.cs" />
     <Compile Include="T7FileHeader.cs" />
+    <Compile Include="Flasher\T7Flasher.cs" />
     <Compile Include="T7Tool.cs">
       <SubType>Form</SubType>
     </Compile>

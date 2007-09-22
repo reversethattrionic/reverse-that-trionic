@@ -169,10 +169,11 @@ namespace T7Tool.KWP
         public RequestResult sendRequest(KWPRequest a_request, out KWPReply r_reply)
         {
             CANMessage msg = new CANMessage(0x240, 0, 8);
-            uint row;
-            for (row = 0; row < nrOfRowsToSend(a_request.getData()); row++)
+            uint row = nrOfRowsToSend(a_request.getData());
+            // Send one or several request messages.
+            for (; row > 0; row--)
             {
-                msg.setData(createCanMessage(a_request.getData(), row));
+                msg.setData(createCanMessage(a_request.getData(), row - 1));
                 if (!m_canDevice.sendMessage(msg))
                 {
                     r_reply = new KWPReply();
@@ -180,17 +181,19 @@ namespace T7Tool.KWP
                 }
             }
             msg = m_kwpCanListener.waitForMessage(0x258, timeoutPeriod);
+            // Receive one or several replys and send an ack for each reply.
             if (msg.getID() == 0x258)
             {
                 uint nrOfRows = nrOfRowsToRead(msg.getData());
                 row = 0;
                 if (nrOfRows == 0)
                     throw new Exception("Wrong nr of rows");
-                byte[] reply = new byte[nrOfRows * 6];
+                //Assume that no KWP reply contains more than 0xFF bytes
+                byte[] reply = new byte[0xFF];
                 reply = collectReply(reply, msg.getData(), row);
                 sendAck(nrOfRows - 1);
                 nrOfRows--;
-                while (nrOfRows > 0)
+                while ((msg.getCanData(0) & 0x0f) > 0)
                 {
                     msg = m_kwpCanListener.waitForMessage(0x258, timeoutPeriod);
                     if (msg.getID() == 0x258)
@@ -248,25 +251,33 @@ namespace T7Tool.KWP
         /// </summary>
         /// <remarks>
         /// A KWP request may result in multi row CAN messages. This method
-        /// creates one CAN message for a row [1..[
+        /// creates one CAN message for a row [0..[
         /// </remarks>
         /// <param name="a_data">The data to insert into the CAN message.</param>
         /// <param name="a_row">The row.</param>
         /// <returns>A CAN message represented by a ulong.</returns>
         private ulong createCanMessage(byte[] a_data, uint a_row)
         {
-            if (a_row > nrOfRowsToSend(a_data) - 1)
+            if (a_row > nrOfRowsToSend(a_data))
                 throw new Exception("Message nr out of index");
             ulong result = 0;
             uint i = 0;
-            result = setCanData(result, (byte)(0x40 | a_row), i++);
+            if(nrOfRowsToSend(a_data) - a_row - 1 == 0)
+                result = setCanData(result, (byte)(0x40 | a_row), i++);
+            else
+                result = setCanData(result, (byte)a_row, i++);
             result = setCanData(result, (byte)0xA1, i++);
             uint j;
-            if (a_row == 0)
+            if (nrOfRowsToSend(a_data) - a_row - 1 == 0)
                 j = 0;
             else
-                j = (a_row * 6) - 1;
-            for (; j < a_data.Length; i++, j++)
+                j = ((nrOfRowsToSend(a_data) - a_row  - 1)* 6);
+            int nrOfBytesToCopy;
+            if (a_data.Length - j < 6)
+                nrOfBytesToCopy = (int)(a_data.Length - j);
+            else
+                nrOfBytesToCopy = 6;
+            for (int k = 0; k < nrOfBytesToCopy; i++, j++, k++)
                 result = setCanData(result, (byte)a_data[j], i);
             return result;
         }

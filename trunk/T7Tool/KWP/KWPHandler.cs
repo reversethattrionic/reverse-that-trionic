@@ -87,7 +87,7 @@ namespace T7Tool.KWP
             if (result != KWPResult.OK)
                 return false;
             //Check if sequrity was granted.
-            if ((reply.getData()[0] == 0x67) && (reply.getData()[2] == 0x34))
+            if ((reply.getMode() == 0x67) && (reply.getData()[0] == 0x34))
                 return true;
 
             return false;
@@ -98,8 +98,16 @@ namespace T7Tool.KWP
             KWPReply reply = new KWPReply();
             KWPResult result;
             result = sendRequest(new KWPRequest(0x1A,0x90), out reply);
-            r_vin = getString(reply);
-            return KWPResult.OK;
+            if (result == KWPResult.OK)
+            {
+                r_vin = getString(reply);
+                return KWPResult.OK;
+            }
+            else
+            {
+                r_vin = "";
+                return KWPResult.Timeout;
+            }
         }
 
         public KWPResult getImmo(out string r_immo)
@@ -138,6 +146,48 @@ namespace T7Tool.KWP
             return result;
         }
 
+        public bool sendReadRequest(uint a_address, uint a_length)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            byte[] lengthAndAddress = new byte[5];
+            //set length (byte 0 and 1)
+            lengthAndAddress[0] = (byte)(a_length >> 8);
+            lengthAndAddress[1] = (byte)(a_length);
+            //set address (byte 2 to 4);
+            lengthAndAddress[2] = (byte)(a_address >> 16);
+            lengthAndAddress[3] = (byte)(a_address >> 8);
+            lengthAndAddress[4] = (byte)(a_address);
+            result = sendRequest(new KWPRequest(0x2C, 0xF0, 0x03, lengthAndAddress), out reply);
+            if (result == KWPResult.OK)
+                return true;
+            else
+                return false;
+        }
+
+        public bool sendDataTransferExitRequest()
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x82, 0x00), out reply);
+            if (result == KWPResult.OK)
+                return true;
+            else 
+                return false;
+        }
+
+        public bool sendDataTransferRequest(out byte[] r_data)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            result = sendRequest(new KWPRequest(0x21, 0xF0), out reply);
+            r_data = reply.getData();
+            if (result == KWPResult.OK)
+                return true;
+            else 
+                return false;
+        }
+
         private KWPResult sendRequest(KWPRequest a_request, out KWPReply a_reply)
         {
             KWPReply reply = new KWPReply();
@@ -170,8 +220,7 @@ namespace T7Tool.KWP
         {
             int key;
             byte[] returnKey = new byte[2];
-            int seed = (int)a_seed[0] << 8;
-            seed = seed & (int)a_seed[1];
+            int seed = a_seed[0] << 8 | a_seed[1];
     
             key = seed << 2;
             key &= 0xFFFF;
@@ -179,9 +228,8 @@ namespace T7Tool.KWP
             key -= (a_method == 1 ? 0x1F6F : 0x2356);
             key &= 0xFFFF;
 
-            returnKey[1] = (byte)key;
-            key = key >> 8;
-            returnKey[0] = (byte)key;
+            returnKey[0] = (byte)((key >> 8) & 0xFF);
+            returnKey[1] = (byte)(key & 0xFF);
 
             return returnKey;
         }

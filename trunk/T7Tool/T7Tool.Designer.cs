@@ -62,6 +62,24 @@ namespace T7Tool
             this.carDescriptionTextBox = new System.Windows.Forms.TextBox();
             this.chassisID = new System.Windows.Forms.Label();
             this.ECUPatchTabPage = new System.Windows.Forms.TabPage();
+            this.flashWriteButton = new System.Windows.Forms.RadioButton();
+            this.flashStatusLabel = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.flashNrOfBytesLabel = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.flashFileNameLabel = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.flashDownLoadButton = new System.Windows.Forms.RadioButton();
+            this.flashStartButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.ecuVINTextBox = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.ecuImmoTextBox = new System.Windows.Forms.TextBox();
+            this.ecuSWVerTextBox = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.ecuCarDescTextBox = new System.Windows.Forms.TextBox();
             this.kwpDeviceConnectionStatus = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.kwpDeviceOpenButton = new System.Windows.Forms.Button();
@@ -70,23 +88,7 @@ namespace T7Tool
             this.ToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.getIDFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.ecuVINTextBox = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.ecuCSFBTextBox = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.ecuImmoTextBox = new System.Windows.Forms.TextBox();
-            this.ecuCSF2TextBox = new System.Windows.Forms.TextBox();
-            this.ecuCSFWTextBox = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.ecuFWLengthTextBox = new System.Windows.Forms.TextBox();
-            this.ecuSWVerTextBox = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.ecuCarDescTextBox = new System.Windows.Forms.TextBox();
+            this.flashFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuStrip1.SuspendLayout();
             this.ECUTabControl.SuspendLayout();
             this.fileInfoPage.SuspendLayout();
@@ -443,6 +445,15 @@ namespace T7Tool
             // 
             // ECUPatchTabPage
             // 
+            this.ECUPatchTabPage.Controls.Add(this.flashWriteButton);
+            this.ECUPatchTabPage.Controls.Add(this.flashStatusLabel);
+            this.ECUPatchTabPage.Controls.Add(this.label9);
+            this.ECUPatchTabPage.Controls.Add(this.flashNrOfBytesLabel);
+            this.ECUPatchTabPage.Controls.Add(this.label12);
+            this.ECUPatchTabPage.Controls.Add(this.flashFileNameLabel);
+            this.ECUPatchTabPage.Controls.Add(this.label8);
+            this.ECUPatchTabPage.Controls.Add(this.flashDownLoadButton);
+            this.ECUPatchTabPage.Controls.Add(this.flashStartButton);
             this.ECUPatchTabPage.Controls.Add(this.tableLayoutPanel1);
             this.ECUPatchTabPage.Controls.Add(this.kwpDeviceConnectionStatus);
             this.ECUPatchTabPage.Controls.Add(this.label7);
@@ -455,6 +466,197 @@ namespace T7Tool
             this.ECUPatchTabPage.TabIndex = 1;
             this.ECUPatchTabPage.Text = "T7 ECU";
             this.ECUPatchTabPage.UseVisualStyleBackColor = true;
+            // 
+            // flashWriteButton
+            // 
+            this.flashWriteButton.AutoSize = true;
+            this.flashWriteButton.Location = new System.Drawing.Point(18, 261);
+            this.flashWriteButton.Name = "flashWriteButton";
+            this.flashWriteButton.Size = new System.Drawing.Size(75, 17);
+            this.flashWriteButton.TabIndex = 14;
+            this.flashWriteButton.TabStop = true;
+            this.flashWriteButton.Text = "Write flash";
+            this.flashWriteButton.UseVisualStyleBackColor = true;
+            // 
+            // flashStatusLabel
+            // 
+            this.flashStatusLabel.AutoSize = true;
+            this.flashStatusLabel.Location = new System.Drawing.Point(83, 294);
+            this.flashStatusLabel.Name = "flashStatusLabel";
+            this.flashStatusLabel.Size = new System.Drawing.Size(37, 13);
+            this.flashStatusLabel.TabIndex = 13;
+            this.flashStatusLabel.Text = "          ";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(21, 294);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(40, 13);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "Status:";
+            // 
+            // flashNrOfBytesLabel
+            // 
+            this.flashNrOfBytesLabel.AutoSize = true;
+            this.flashNrOfBytesLabel.Location = new System.Drawing.Point(83, 307);
+            this.flashNrOfBytesLabel.Name = "flashNrOfBytesLabel";
+            this.flashNrOfBytesLabel.Size = new System.Drawing.Size(52, 13);
+            this.flashNrOfBytesLabel.TabIndex = 11;
+            this.flashNrOfBytesLabel.Text = "               ";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(21, 307);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(48, 13);
+            this.label12.TabIndex = 10;
+            this.label12.Text = "Nr of kb:";
+            // 
+            // flashFileNameLabel
+            // 
+            this.flashFileNameLabel.AutoSize = true;
+            this.flashFileNameLabel.Location = new System.Drawing.Point(83, 320);
+            this.flashFileNameLabel.Name = "flashFileNameLabel";
+            this.flashFileNameLabel.Size = new System.Drawing.Size(94, 13);
+            this.flashFileNameLabel.TabIndex = 9;
+            this.flashFileNameLabel.Text = "                             ";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(21, 320);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(55, 13);
+            this.label8.TabIndex = 8;
+            this.label8.Text = "File name:";
+            // 
+            // flashDownLoadButton
+            // 
+            this.flashDownLoadButton.AutoSize = true;
+            this.flashDownLoadButton.Location = new System.Drawing.Point(18, 237);
+            this.flashDownLoadButton.Name = "flashDownLoadButton";
+            this.flashDownLoadButton.Size = new System.Drawing.Size(76, 17);
+            this.flashDownLoadButton.TabIndex = 6;
+            this.flashDownLoadButton.TabStop = true;
+            this.flashDownLoadButton.Text = "Read flash";
+            this.flashDownLoadButton.UseVisualStyleBackColor = true;
+            // 
+            // flashStartButton
+            // 
+            this.flashStartButton.Location = new System.Drawing.Point(153, 237);
+            this.flashStartButton.Name = "flashStartButton";
+            this.flashStartButton.Size = new System.Drawing.Size(68, 23);
+            this.flashStartButton.TabIndex = 5;
+            this.flashStartButton.Text = "Start";
+            this.flashStartButton.UseVisualStyleBackColor = true;
+            this.flashStartButton.Click += new System.EventHandler(this.flashStartButton_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.ecuVINTextBox, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label10, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label11, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.ecuImmoTextBox, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.ecuSWVerTextBox, 1, 8);
+            this.tableLayoutPanel1.Controls.Add(this.label14, 0, 8);
+            this.tableLayoutPanel1.Controls.Add(this.label15, 0, 9);
+            this.tableLayoutPanel1.Controls.Add(this.ecuCarDescTextBox, 1, 9);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(18, 66);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 10;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(265, 108);
+            this.tableLayoutPanel1.TabIndex = 4;
+            // 
+            // ecuVINTextBox
+            // 
+            this.ecuVINTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.ecuVINTextBox.Location = new System.Drawing.Point(135, 3);
+            this.ecuVINTextBox.MaxLength = 30;
+            this.ecuVINTextBox.Name = "ecuVINTextBox";
+            this.ecuVINTextBox.Size = new System.Drawing.Size(127, 20);
+            this.ecuVINTextBox.TabIndex = 5;
+            // 
+            // label10
+            // 
+            this.label10.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(3, 32);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(72, 13);
+            this.label10.TabIndex = 2;
+            this.label10.Text = "Immobilizer ID";
+            // 
+            // label11
+            // 
+            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(3, 6);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(84, 13);
+            this.label11.TabIndex = 7;
+            this.label11.Text = "Chassis ID (VIN)";
+            // 
+            // ecuImmoTextBox
+            // 
+            this.ecuImmoTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.ecuImmoTextBox.Location = new System.Drawing.Point(135, 29);
+            this.ecuImmoTextBox.MaxLength = 15;
+            this.ecuImmoTextBox.Name = "ecuImmoTextBox";
+            this.ecuImmoTextBox.Size = new System.Drawing.Size(127, 20);
+            this.ecuImmoTextBox.TabIndex = 8;
+            // 
+            // ecuSWVerTextBox
+            // 
+            this.ecuSWVerTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.ecuSWVerTextBox.Location = new System.Drawing.Point(135, 55);
+            this.ecuSWVerTextBox.MaxLength = 12;
+            this.ecuSWVerTextBox.Name = "ecuSWVerTextBox";
+            this.ecuSWVerTextBox.Size = new System.Drawing.Size(127, 20);
+            this.ecuSWVerTextBox.TabIndex = 14;
+            // 
+            // label14
+            // 
+            this.label14.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(3, 58);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(86, 13);
+            this.label14.TabIndex = 15;
+            this.label14.Text = "Software version";
+            // 
+            // label15
+            // 
+            this.label15.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(3, 86);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(77, 13);
+            this.label15.TabIndex = 16;
+            this.label15.Text = "Car description";
+            // 
+            // ecuCarDescTextBox
+            // 
+            this.ecuCarDescTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.ecuCarDescTextBox.Location = new System.Drawing.Point(135, 83);
+            this.ecuCarDescTextBox.MaxLength = 30;
+            this.ecuCarDescTextBox.Name = "ecuCarDescTextBox";
+            this.ecuCarDescTextBox.Size = new System.Drawing.Size(127, 20);
+            this.ecuCarDescTextBox.TabIndex = 17;
             // 
             // kwpDeviceConnectionStatus
             // 
@@ -476,7 +678,7 @@ namespace T7Tool
             // 
             // kwpDeviceOpenButton
             // 
-            this.kwpDeviceOpenButton.Location = new System.Drawing.Point(144, 26);
+            this.kwpDeviceOpenButton.Location = new System.Drawing.Point(153, 25);
             this.kwpDeviceOpenButton.Name = "kwpDeviceOpenButton";
             this.kwpDeviceOpenButton.Size = new System.Drawing.Size(75, 23);
             this.kwpDeviceOpenButton.TabIndex = 1;
@@ -512,199 +714,10 @@ namespace T7Tool
             this.saveFileDialog.AddExtension = false;
             this.saveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
             // 
-            // tableLayoutPanel1
+            // flashFileDialog
             // 
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.label9, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.ecuVINTextBox, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label10, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.ecuCSFBTextBox, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.label11, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.ecuImmoTextBox, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.ecuCSF2TextBox, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.ecuCSFWTextBox, 1, 6);
-            this.tableLayoutPanel1.Controls.Add(this.label12, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.label13, 0, 7);
-            this.tableLayoutPanel1.Controls.Add(this.ecuFWLengthTextBox, 1, 7);
-            this.tableLayoutPanel1.Controls.Add(this.ecuSWVerTextBox, 1, 8);
-            this.tableLayoutPanel1.Controls.Add(this.label14, 0, 8);
-            this.tableLayoutPanel1.Controls.Add(this.label15, 0, 9);
-            this.tableLayoutPanel1.Controls.Add(this.ecuCarDescTextBox, 1, 9);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(18, 66);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 10;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(265, 212);
-            this.tableLayoutPanel1.TabIndex = 4;
-            // 
-            // label8
-            // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 84);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(73, 13);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "Checksum FB";
-            // 
-            // label9
-            // 
-            this.label9.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(3, 58);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(72, 13);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "Checksum F2";
-            // 
-            // ecuVINTextBox
-            // 
-            this.ecuVINTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuVINTextBox.Location = new System.Drawing.Point(135, 3);
-            this.ecuVINTextBox.MaxLength = 30;
-            this.ecuVINTextBox.Name = "ecuVINTextBox";
-            this.ecuVINTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuVINTextBox.TabIndex = 5;
-            // 
-            // label10
-            // 
-            this.label10.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(3, 32);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(72, 13);
-            this.label10.TabIndex = 2;
-            this.label10.Text = "Immobilizer ID";
-            // 
-            // ecuCSFBTextBox
-            // 
-            this.ecuCSFBTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuCSFBTextBox.Location = new System.Drawing.Point(135, 81);
-            this.ecuCSFBTextBox.MaxLength = 8;
-            this.ecuCSFBTextBox.Name = "ecuCSFBTextBox";
-            this.ecuCSFBTextBox.ReadOnly = true;
-            this.ecuCSFBTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuCSFBTextBox.TabIndex = 6;
-            // 
-            // label11
-            // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(3, 6);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(84, 13);
-            this.label11.TabIndex = 7;
-            this.label11.Text = "Chassis ID (VIN)";
-            // 
-            // ecuImmoTextBox
-            // 
-            this.ecuImmoTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuImmoTextBox.Location = new System.Drawing.Point(135, 29);
-            this.ecuImmoTextBox.MaxLength = 15;
-            this.ecuImmoTextBox.Name = "ecuImmoTextBox";
-            this.ecuImmoTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuImmoTextBox.TabIndex = 8;
-            // 
-            // ecuCSF2TextBox
-            // 
-            this.ecuCSF2TextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuCSF2TextBox.Location = new System.Drawing.Point(135, 55);
-            this.ecuCSF2TextBox.MaxLength = 8;
-            this.ecuCSF2TextBox.Name = "ecuCSF2TextBox";
-            this.ecuCSF2TextBox.ReadOnly = true;
-            this.ecuCSF2TextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuCSF2TextBox.TabIndex = 9;
-            // 
-            // ecuCSFWTextBox
-            // 
-            this.ecuCSFWTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuCSFWTextBox.Location = new System.Drawing.Point(135, 107);
-            this.ecuCSFWTextBox.MaxLength = 8;
-            this.ecuCSFWTextBox.Name = "ecuCSFWTextBox";
-            this.ecuCSFWTextBox.ReadOnly = true;
-            this.ecuCSFWTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuCSFWTextBox.TabIndex = 10;
-            // 
-            // label12
-            // 
-            this.label12.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(3, 110);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(77, 13);
-            this.label12.TabIndex = 11;
-            this.label12.Text = "Checksum FW";
-            this.ToolTip.SetToolTip(this.label12, "Firmware checksum");
-            // 
-            // label13
-            // 
-            this.label13.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(3, 136);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(81, 13);
-            this.label13.TabIndex = 12;
-            this.label13.Text = "Firmware length";
-            // 
-            // ecuFWLengthTextBox
-            // 
-            this.ecuFWLengthTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuFWLengthTextBox.Location = new System.Drawing.Point(135, 133);
-            this.ecuFWLengthTextBox.MaxLength = 8;
-            this.ecuFWLengthTextBox.Name = "ecuFWLengthTextBox";
-            this.ecuFWLengthTextBox.ReadOnly = true;
-            this.ecuFWLengthTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuFWLengthTextBox.TabIndex = 13;
-            // 
-            // ecuSWVerTextBox
-            // 
-            this.ecuSWVerTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuSWVerTextBox.Location = new System.Drawing.Point(135, 159);
-            this.ecuSWVerTextBox.MaxLength = 12;
-            this.ecuSWVerTextBox.Name = "ecuSWVerTextBox";
-            this.ecuSWVerTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuSWVerTextBox.TabIndex = 14;
-            // 
-            // label14
-            // 
-            this.label14.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(3, 162);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(86, 13);
-            this.label14.TabIndex = 15;
-            this.label14.Text = "Software version";
-            // 
-            // label15
-            // 
-            this.label15.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(3, 190);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(77, 13);
-            this.label15.TabIndex = 16;
-            this.label15.Text = "Car description";
-            // 
-            // ecuCarDescTextBox
-            // 
-            this.ecuCarDescTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ecuCarDescTextBox.Location = new System.Drawing.Point(135, 187);
-            this.ecuCarDescTextBox.MaxLength = 30;
-            this.ecuCarDescTextBox.Name = "ecuCarDescTextBox";
-            this.ecuCarDescTextBox.Size = new System.Drawing.Size(127, 20);
-            this.ecuCarDescTextBox.TabIndex = 17;
+            this.flashFileDialog.Title = "Select file";
+            this.flashFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.flashFileDialog_FileOk);
             // 
             // T7Tool
             // 
@@ -776,22 +789,24 @@ namespace T7Tool
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label kwpDeviceConnectionStatus;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox ecuVINTextBox;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox ecuCSFBTextBox;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox ecuImmoTextBox;
-        private System.Windows.Forms.TextBox ecuCSF2TextBox;
-        private System.Windows.Forms.TextBox ecuCSFWTextBox;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.TextBox ecuFWLengthTextBox;
         private System.Windows.Forms.TextBox ecuSWVerTextBox;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox ecuCarDescTextBox;
+        private System.Windows.Forms.Button flashStartButton;
+        private System.Windows.Forms.RadioButton flashDownLoadButton;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label flashNrOfBytesLabel;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label flashFileNameLabel;
+        private System.Windows.Forms.Label flashStatusLabel;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.RadioButton flashWriteButton;
+        private System.Windows.Forms.SaveFileDialog flashFileDialog;
     }
 }
 
