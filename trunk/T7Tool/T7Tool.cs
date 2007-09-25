@@ -19,11 +19,19 @@ namespace T7Tool
         public T7Tool()
         {
             InitializeComponent();
+
+            t7InfoHeader = new T7FileHeader();
+            canUsbDevice = new CANUSBDevice();
+            kwpCanDevice = new KWPCANDevice();
+            kwpHandler = new KWPHandler();
+            m_t7Flasher = new T7Flasher(kwpHandler);
+
             timerDelegate = new TimerCallback(this.flasherInfo);
             stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 1000, 250);
             flashWriteButton.Enabled = false;
             flashDownLoadButton.Select();
             flashStartButton.Enabled = false;
+
         }
 
 
@@ -100,7 +108,7 @@ namespace T7Tool
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+            exitApplication();
         }
 
         private void fixChecksumButton_Click(object sender, EventArgs e)
@@ -193,7 +201,13 @@ namespace T7Tool
             flashNrOfBytesLabel.Text = "" + m_t7Flasher.getNrOfBytesRead() / 1024;
             switch (m_t7Flasher.getStatus())
             {
-                case T7Flasher.FlashStatus.Completed: flashStatusLabel.Text = "Completed"; break;
+                case T7Flasher.FlashStatus.Completed:
+                    {
+                        flashStartButton.Text = "Start";
+                        flashStatusLabel.Text = "Completed";
+                        flashFileNameLabel.Text = "";
+                        break;
+                    } 
                 case T7Flasher.FlashStatus.Reading:
                     {
                         flashStartButton.Text = "Stop";
@@ -202,7 +216,12 @@ namespace T7Tool
                     }
                 case T7Flasher.FlashStatus.Writing: flashStatusLabel.Text = "Writing"; break;
                 case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No sequrity access"; break;
-                case T7Flasher.FlashStatus.DoinNuthin: flashStatusLabel.Text = "Not started"; break;
+                case T7Flasher.FlashStatus.DoinNuthin:
+                    {
+                        flashStatusLabel.Text = "Not started";
+                        flashStartButton.Text = "Start";
+                        break;
+                    }
             }
         }
 
@@ -256,14 +275,14 @@ namespace T7Tool
 
         }
 
-        T7FileHeader t7InfoHeader = new T7FileHeader();
-        static CANUSBDevice canUsbDevice = new CANUSBDevice();
-        static KWPCANDevice kwpCanDevice = new KWPCANDevice();
-        static KWPHandler kwpHandler = new KWPHandler();
-        T7Flasher m_t7Flasher = new T7Flasher(kwpHandler);
-        string m_fileName;
-        TimerCallback timerDelegate;
-        System.Threading.Timer stateTimer;
+        private T7FileHeader t7InfoHeader = null;
+        private CANUSBDevice canUsbDevice = null;
+        private KWPCANDevice kwpCanDevice = null;
+        private KWPHandler kwpHandler = null;
+        private T7Flasher m_t7Flasher = null;
+        private string m_fileName;
+        private TimerCallback timerDelegate;
+        private System.Threading.Timer stateTimer;
 
         private void flashStartButton_Click(object sender, EventArgs e)
         {
@@ -288,6 +307,22 @@ namespace T7Tool
 
         }
 
+        private void T7Tool_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void T7Tool_Disposed(object sender, EventArgs e)
+        {
+            exitApplication();
+        }
+
+
+        private void exitApplication()
+        {
+            Environment.Exit(0);
+        }
 
     }
 }

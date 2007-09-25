@@ -47,6 +47,16 @@ namespace T7Tool.Flasher
             m_thread.Start();
         }
 
+        ~T7Flasher()
+        {
+            lock (m_synchObject)
+            {
+                m_endThread = true;
+            }
+            m_resetEvent.Set();
+            m_thread.Join();
+        }
+
         public void readFlash(string a_fileName)
         {
             lock (m_synchObject)
@@ -62,9 +72,15 @@ namespace T7Tool.Flasher
             bool gotSequrityAccess = false;
             while (true)
             {
+                
                 m_nrOfRetries = 0;
                 m_nrOfBytesRead = 0;
                 m_resetEvent.WaitOne(-1, true);
+                lock (m_synchObject)
+                {
+                    if (m_endThread)
+                        return;
+                }
                 m_kwpHandler.startSession();
                 if (!gotSequrityAccess)
                 {
@@ -96,6 +112,8 @@ namespace T7Tool.Flasher
                         {
                             if (m_command == FlashCommand.StopCommand)
                                 break;
+                            if (m_endThread)
+                                return;
                         }
                         m_flashStatus = FlashStatus.Reading;
                         while(!m_kwpHandler.sendReadRequest((uint)(nrOfBytes * i), (uint)nrOfBytes))
@@ -127,5 +145,6 @@ namespace T7Tool.Flasher
         private int m_nrOfRetries;
         private FlashStatus m_flashStatus;
         private int m_nrOfBytesRead;
+        private bool m_endThread = false;
     }
 }
