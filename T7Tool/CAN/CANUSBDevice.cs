@@ -12,11 +12,24 @@ namespace T7Tool.KWP
 
         static uint m_deviceHandle = 0;
         Thread m_readThread;
+        Object m_synchObject = new Object();
+        bool m_endThread = false;
 
         public CANUSBDevice()
         {
             m_readThread = new Thread(readMessages);
         }
+
+        ~CANUSBDevice()
+        {
+            lock (m_synchObject)
+            {
+                m_endThread = true;
+            }
+            close();
+            m_readThread.Join();
+        }
+
 
         public void readMessages()
         {
@@ -25,6 +38,11 @@ namespace T7Tool.KWP
             CANMessage canMessage = new CANMessage();
             while (true)
             {
+                lock (m_synchObject)
+                {
+                    if (m_endThread)
+                        return;
+                }
                 readResult = LAWICEL.canusb_Read(m_deviceHandle, out r_canMsg);
                 if (readResult == LAWICEL.ERROR_CANUSB_OK)
                 {
@@ -57,7 +75,7 @@ namespace T7Tool.KWP
             LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
             LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
             LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (waitForMessage(0x1A0, 5000, out msg) != 0)
+            if (waitForMessage(0x280, 5000, out msg) != 0)
             {
                 m_readThread.Start();
                 return OpenResult.OK;
@@ -70,7 +88,7 @@ namespace T7Tool.KWP
                 LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
                 LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
                 LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if(waitForMessage(0x1A0, 5000, out msg) != 0)
+            if (waitForMessage(0x280, 5000, out msg) != 0)
             {
                 m_readThread.Start();
                 return OpenResult.OK;
@@ -82,7 +100,8 @@ namespace T7Tool.KWP
 
         override public CloseResult close()
         {
-            m_readThread.Join();
+            if(m_readThread.IsAlive)
+                m_readThread.Join();
             int res = LAWICEL.canusb_Close(m_deviceHandle);
             m_deviceHandle = 0;
             if (LAWICEL.ERROR_CANUSB_OK == res)
