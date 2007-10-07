@@ -24,7 +24,10 @@ namespace T7Tool.Flasher
             Writing,
             NoSequrityAccess,
             DoinNuthin,
-            Completed
+            Completed,
+            NoSuchFile,
+            EraseError,
+            WriteError
         }
 
 
@@ -67,6 +70,16 @@ namespace T7Tool.Flasher
             m_resetEvent.Set();
         }
 
+        public void writeFlash(string a_fileName)
+        {
+            lock (m_synchObject)
+            {
+                m_command = FlashCommand.WriteCommand;
+                m_fileName = a_fileName;
+            }
+            m_resetEvent.Set();
+        }
+
         private void run()
         {
             bool gotSequrityAccess = false;
@@ -76,6 +89,7 @@ namespace T7Tool.Flasher
                 m_nrOfRetries = 0;
                 m_nrOfBytesRead = 0;
                 m_resetEvent.WaitOne(-1, true);
+                gotSequrityAccess = false;
                 lock (m_synchObject)
                 {
                     if (m_endThread)
@@ -131,7 +145,74 @@ namespace T7Tool.Flasher
                     fileStream.Close();
                     m_kwpHandler.sendDataTransferExitRequest();
                 }
-                m_flashStatus = FlashStatus.DoinNuthin;
+                else if (m_command == FlashCommand.WriteCommand)
+                {
+                    int nrOfBytes = 128;
+                    int i = 0;
+                    byte[] data = new byte[nrOfBytes];
+                    m_flashStatus = FlashStatus.Writing;
+                    if (!File.Exists(m_fileName))
+                    {
+                        m_flashStatus = FlashStatus.NoSuchFile;
+                        break;
+                    }
+                    if (m_kwpHandler.sendEraseRequest() != KWPResult.OK)
+                    {
+                        m_flashStatus = FlashStatus.EraseError;
+                        break;
+                    }
+                    FileStream fs = new FileStream(m_fileName, FileMode.Open, FileAccess.Read);
+
+                    //Write 0x0-0x7B000
+                    if (m_kwpHandler.sendWriteRequest(0x0, 0x7B000) != KWPResult.OK)
+                    {
+                        m_flashStatus = FlashStatus.WriteError;
+                        break;
+                    }
+                    for (i = 0; i < 0x7B000 / nrOfBytes; i++)
+                    {
+                        fs.Read(data, 0, nrOfBytes);
+                        m_nrOfBytesRead = i * nrOfBytes;
+                        if (m_kwpHandler.sendWriteDataRequest(data) != KWPResult.OK)
+                        {
+                            m_flashStatus = FlashStatus.WriteError;
+                            break; 
+                        }
+                        lock (m_synchObject)
+                        {
+                            if (m_command == FlashCommand.StopCommand)
+                                break;
+                            if (m_endThread)
+                                return;
+                        }
+                    }
+
+                    //Write 0x7FE00-0x7FFFF
+                    if (m_kwpHandler.sendWriteRequest(0x7FE00, 0x200) != KWPResult.OK)
+                    {
+                        m_flashStatus = FlashStatus.WriteError;
+                        break;
+                    }
+                    fs.Seek(0x7FE00, System.IO.SeekOrigin.Begin);
+                    for (i = 0x7FE00 / nrOfBytes; i < 0x80000 / nrOfBytes; i++)
+                    {
+                        fs.Read(data, 0, nrOfBytes);
+                        m_nrOfBytesRead = i * nrOfBytes;
+                        if (m_kwpHandler.sendWriteDataRequest(data) != KWPResult.OK)
+                        {
+                            m_flashStatus = FlashStatus.WriteError;
+                            break;
+                        }
+                        lock (m_synchObject)
+                        {
+                            if (m_command == FlashCommand.StopCommand)
+                                break;
+                            if (m_endThread)
+                                return;
+                        }
+                    }
+                }
+                m_flashStatus = FlashStatus.Completed;
             }
         }
 

@@ -7,6 +7,7 @@ namespace T7Tool.KWP
     enum KWPResult
     {
         OK,
+        NOK,
         Timeout,
         DeviceNotConnected
     }
@@ -144,6 +145,96 @@ namespace T7Tool.KWP
             result = sendRequest(new KWPRequest(0x1A, 0x97), out reply);
             r_swVersion = getString(reply);
             return result;
+        }
+
+        /// <summary>
+        /// sendEraseRequest sends an erase request to the ECU.
+        /// </summary>
+        /// <returns>KWPResult</returns>
+        public KWPResult sendEraseRequest()
+        {
+            KWPReply reply = new KWPReply();
+            KWPReply reply2 = new KWPReply();
+            KWPResult result = KWPResult.Timeout;
+            int i = 0;
+
+            //First erase message. Up to 5 retries.
+            //Mode = 0x31
+            //PID = 0x52
+            //Expected result is 0x71
+            result = sendRequest(new KWPRequest(0x31, 0x52), out reply);
+            while (reply.getMode() != 0x71) 
+            {
+                System.Threading.Thread.Sleep(1000);
+                result = sendRequest(new KWPRequest(0x31, 0x52), out reply);
+                if (i++ > 15) return KWPResult.Timeout;
+            }
+            if (result != KWPResult.OK) 
+                return result;
+
+            //Second erase message. Up to 10 retries.
+            //Mode = 0x31
+            //PID = 0x53
+            //Expected result is 0x71
+            i = 0;
+            result = sendRequest(new KWPRequest(0x31, 0x53), out reply2);
+            while (reply2.getMode() != 0x71)
+            {
+                System.Threading.Thread.Sleep(1000);
+                result = sendRequest(new KWPRequest(0x31, 0x53), out reply2);
+                if (i++ > 20) return KWPResult.Timeout;
+            }
+
+            //Erase confirm message
+            //Mode = 0x3E
+            //Expected result is 0x7E
+            result = sendRequest(new KWPRequest(0x3E, 0x53), out reply2);
+
+            return result;
+        }
+
+        public KWPResult sendWriteRequest(uint a_address, uint a_length)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            byte[] addressAndLength = new byte[7];
+            //set address (byte 0 to 2)
+            addressAndLength[0] = (byte)(a_address >> 16);
+            addressAndLength[1] = (byte)(a_address >> 8);
+            addressAndLength[2] = (byte)(a_address);
+            //set length (byte 3 to 6);
+            addressAndLength[3] = (byte)(a_length >> 24);
+            addressAndLength[4] = (byte)(a_length >> 16);
+            addressAndLength[5] = (byte)(a_length >> 8);
+            addressAndLength[6] = (byte)(a_length);
+
+            //Send request
+            //Mode = 0x34
+            //PID = no PID used by this request
+            //Data = aaallll (aaa = address, llll = length)
+            //Expected result = 0x74
+            result = sendRequest(new KWPRequest(0x34, addressAndLength), out reply);
+            if (reply.getMode() != 0x74)
+                return KWPResult.NOK;
+            else
+                return result;
+        }
+
+        public KWPResult sendWriteDataRequest(byte[] a_data)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+
+            //Send request
+            //Mode = 0x36
+            //PID = no PID used by this request
+            //Data = data to be flashed
+            //Expected result = 0x76
+            result = sendRequest(new KWPRequest(0x36, a_data), out reply);
+            if (reply.getMode() != 0x76)
+                return KWPResult.NOK;
+            else
+                return result;
         }
 
         public bool sendReadRequest(uint a_address, uint a_length)

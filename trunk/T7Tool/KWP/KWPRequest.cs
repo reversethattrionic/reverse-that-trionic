@@ -22,6 +22,19 @@ namespace T7Tool.KWP
             m_nrOfPid = 1;
         }
 
+        public KWPRequest(byte a_mode, byte[] a_data)
+        {
+            int i = 0;
+            byte length = (byte)(1 + a_data.Length);
+            m_request = new byte[length + 1];
+            //Set length of request
+            m_request[i++] = length;
+            m_request[i++] = a_mode;
+            for (int j = 0; i < m_request.Length; i++, j++)
+                m_request[i] = a_data[j];
+            m_nrOfPid = 0;
+        }
+
         public KWPRequest(byte a_mode, byte a_pid, byte[] a_data)
         {
             int i = 0;

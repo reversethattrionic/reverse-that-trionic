@@ -11,7 +11,7 @@ namespace T7Tool.KWP
 
         public KWPReply(byte[] a_reply, uint a_nrOfPid)
         {
-            if ((a_nrOfPid > 2) || (a_nrOfPid < 1))
+            if (a_nrOfPid > 2)
                 throw new Exception("Nr of PID out of range");
             m_reply = a_reply;
             m_nrOfPid = a_nrOfPid;
