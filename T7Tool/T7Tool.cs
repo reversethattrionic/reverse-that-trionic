@@ -28,7 +28,6 @@ namespace T7Tool
 
             timerDelegate = new TimerCallback(this.flasherInfo);
             stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 1000, 250);
-            flashWriteButton.Enabled = false;
             flashDownLoadButton.Select();
             flashStartButton.Enabled = false;
 
@@ -206,6 +205,7 @@ namespace T7Tool
                         flashStartButton.Text = "Start";
                         flashStatusLabel.Text = "Completed";
                         flashFileNameLabel.Text = "";
+                        flashStartButton.Enabled = true;
                         break;
                     } 
                 case T7Flasher.FlashStatus.Reading:
@@ -214,7 +214,12 @@ namespace T7Tool
                         flashStatusLabel.Text = "Reading";
                         break;
                     }
-                case T7Flasher.FlashStatus.Writing: flashStatusLabel.Text = "Writing"; break;
+                case T7Flasher.FlashStatus.Writing:
+                    {
+                        flashStatusLabel.Text = "Writing";
+                        flashStartButton.Enabled = false;
+                        break;
+                    }
                 case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No sequrity access"; break;
                 case T7Flasher.FlashStatus.DoinNuthin:
                     {
@@ -222,6 +227,9 @@ namespace T7Tool
                         flashStartButton.Text = "Start";
                         break;
                     }
+                case T7Flasher.FlashStatus.NoSuchFile: flashStatusLabel.Text = "No such file"; break;
+                case T7Flasher.FlashStatus.EraseError: flashStatusLabel.Text = "Erase error"; break;
+                case T7Flasher.FlashStatus.WriteError: flashStatusLabel.Text = "Write error"; break;
             }
         }
 
@@ -294,6 +302,10 @@ namespace T7Tool
             }
             else
             {
+                if (flashDownLoadButton.Checked)
+                    flashFileDialog.OverwritePrompt = true;
+                else
+                    flashFileDialog.OverwritePrompt = false;
                 flashFileDialog.FileName = ecuSWVerTextBox.Text + ".bin";
                 flashFileDialog.ShowDialog();
             }
@@ -301,9 +313,16 @@ namespace T7Tool
 
         private void flashFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-
-            m_t7Flasher.readFlash(flashFileDialog.FileName);
-            flashFileNameLabel.Text = Path.GetFileName(flashFileDialog.FileName);
+            if (flashDownLoadButton.Checked)
+            {
+                m_t7Flasher.readFlash(flashFileDialog.FileName);
+                flashFileNameLabel.Text = Path.GetFileName(flashFileDialog.FileName);
+            }
+            else
+            {
+                m_t7Flasher.writeFlash(flashFileDialog.FileName);
+                flashFileNameLabel.Text = Path.GetFileName(flashFileDialog.FileName);
+            }
 
         }
 
@@ -321,6 +340,7 @@ namespace T7Tool
 
         private void exitApplication()
         {
+            kwpHandler.closeDevice();
             Environment.Exit(0);
         }
 

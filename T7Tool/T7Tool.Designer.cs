@@ -729,10 +729,10 @@ namespace T7Tool
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "T7Tool";
             this.Text = "T7Tool";
+            this.Disposed += new System.EventHandler(this.T7Tool_Disposed);
+            this.Load += new System.EventHandler(this.T7Tool_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.Load += new System.EventHandler(this.T7Tool_Load);
-            this.Disposed += new System.EventHandler(this.T7Tool_Disposed);
             this.ECUTabControl.ResumeLayout(false);
             this.fileInfoPage.ResumeLayout(false);
             this.fileInfoPage.PerformLayout();
