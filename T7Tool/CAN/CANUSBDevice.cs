@@ -80,6 +80,7 @@ namespace T7Tool.KWP
                 m_readThread.Start();
                 return OpenResult.OK;
             }
+            int res = LAWICEL.canusb_Close(m_deviceHandle);
 
             //P bus not connected
             //Check if I bus is connected
@@ -93,7 +94,7 @@ namespace T7Tool.KWP
                 m_readThread.Start();
                 return OpenResult.OK;
             }
-            int res = LAWICEL.canusb_Close(m_deviceHandle);
+            res = LAWICEL.canusb_Close(m_deviceHandle);
 
             return OpenResult.OpenError;
         }

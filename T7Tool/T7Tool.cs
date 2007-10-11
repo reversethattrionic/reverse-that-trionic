@@ -30,7 +30,7 @@ namespace T7Tool
             stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 1000, 250);
             flashDownLoadButton.Select();
             flashStartButton.Enabled = false;
-
+            kwpDeviceComboBox.SelectedItem = "Lawicel CANUSB";
         }
 
 
@@ -220,7 +220,7 @@ namespace T7Tool
                         flashStartButton.Enabled = false;
                         break;
                     }
-                case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No sequrity access"; break;
+                case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No security access"; break;
                 case T7Flasher.FlashStatus.DoinNuthin:
                     {
                         flashStatusLabel.Text = "Not started";
