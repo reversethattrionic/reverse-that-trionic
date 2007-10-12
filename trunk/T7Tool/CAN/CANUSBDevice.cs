@@ -27,7 +27,6 @@ namespace T7Tool.KWP
                 m_endThread = true;
             }
             close();
-            m_readThread.Join();
         }
 
 
@@ -100,8 +99,6 @@ namespace T7Tool.KWP
 
         override public CloseResult close()
         {
-            if(m_readThread.IsAlive)
-                m_readThread.Join();
             int res = LAWICEL.canusb_Close(m_deviceHandle);
             m_deviceHandle = 0;
             if (LAWICEL.ERROR_CANUSB_OK == res)

@@ -357,6 +357,15 @@ namespace T7Tool
         private void exitApplication()
         {
             kwpHandler.closeDevice();
+            t7InfoHeader = null;
+            canUsbDevice = null;
+            kwpCanDevice = null;
+            kwpHandler = null;
+            m_t7Flasher = null;
+            m_fileName = null;
+            timerDelegate = null;
+            stateTimer = null;
+            Application.Exit();
             Environment.Exit(0);
         }
 
