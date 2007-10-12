@@ -109,8 +109,8 @@ namespace T7Tool.Flasher
                         }
                     }
                 }
-                if (!gotSequrityAccess)
-                    continue;
+                //if (!gotSequrityAccess)
+                 //   continue;
                 if (m_command == FlashCommand.ReadCommand)
                 {
                     int nrOfBytes = 64;
@@ -125,7 +125,7 @@ namespace T7Tool.Flasher
                         lock (m_synchObject)
                         {
                             if (m_command == FlashCommand.StopCommand)
-                                break;
+                                continue;
                             if (m_endThread)
                                 return;
                         }
@@ -154,12 +154,12 @@ namespace T7Tool.Flasher
                     if (!File.Exists(m_fileName))
                     {
                         m_flashStatus = FlashStatus.NoSuchFile;
-                        break;
+                        continue;
                     }
                     if (m_kwpHandler.sendEraseRequest() != KWPResult.OK)
                     {
                         m_flashStatus = FlashStatus.EraseError;
-                        break;
+                       // break;
                     }
                     FileStream fs = new FileStream(m_fileName, FileMode.Open, FileAccess.Read);
 
@@ -167,7 +167,7 @@ namespace T7Tool.Flasher
                     if (m_kwpHandler.sendWriteRequest(0x0, 0x7B000) != KWPResult.OK)
                     {
                         m_flashStatus = FlashStatus.WriteError;
-                        break;
+                        continue;
                     }
                     for (i = 0; i < 0x7B000 / nrOfBytes; i++)
                     {
@@ -176,12 +176,12 @@ namespace T7Tool.Flasher
                         if (m_kwpHandler.sendWriteDataRequest(data) != KWPResult.OK)
                         {
                             m_flashStatus = FlashStatus.WriteError;
-                            break; 
+                            continue; 
                         }
                         lock (m_synchObject)
                         {
                             if (m_command == FlashCommand.StopCommand)
-                                break;
+                                continue;
                             if (m_endThread)
                                 return;
                         }
@@ -191,7 +191,7 @@ namespace T7Tool.Flasher
                     if (m_kwpHandler.sendWriteRequest(0x7FE00, 0x200) != KWPResult.OK)
                     {
                         m_flashStatus = FlashStatus.WriteError;
-                        break;
+                        continue;
                     }
                     fs.Seek(0x7FE00, System.IO.SeekOrigin.Begin);
                     for (i = 0x7FE00 / nrOfBytes; i < 0x80000 / nrOfBytes; i++)
@@ -201,12 +201,12 @@ namespace T7Tool.Flasher
                         if (m_kwpHandler.sendWriteDataRequest(data) != KWPResult.OK)
                         {
                             m_flashStatus = FlashStatus.WriteError;
-                            break;
+                            continue;
                         }
                         lock (m_synchObject)
                         {
                             if (m_command == FlashCommand.StopCommand)
-                                break;
+                                continue;
                             if (m_endThread)
                                 return;
                         }
