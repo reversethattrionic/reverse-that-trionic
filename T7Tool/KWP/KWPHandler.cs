@@ -77,6 +77,8 @@ namespace T7Tool.KWP
             result = sendRequest(new KWPRequest(0x27, 0x05), out reply);
             if (result != KWPResult.OK)
                 return false;
+            if (reply.getData().Length < 2)
+                return false;
             seed[0] = reply.getData()[0];
             seed[1] = reply.getData()[1];
             if (a_method == 1)
@@ -119,6 +121,7 @@ namespace T7Tool.KWP
             r_immo = getString(reply);
             return result;
         }
+
 
         public KWPResult getSwPartNumber(out string r_swPartNo)
         {
