@@ -35,6 +35,17 @@ namespace T7Tool.KWP
             m_nrOfPid = 0;
         }
 
+        public KWPRequest(byte a_mode)
+        {
+            int i = 0;
+            byte length = 1;
+            m_request = new byte[length + 1];
+            //Set length of request
+            m_request[i++] = length;
+            m_request[i++] = a_mode;
+            m_nrOfPid = 0;
+        }
+
         public KWPRequest(byte a_mode, byte a_pid, byte[] a_data)
         {
             int i = 0;
