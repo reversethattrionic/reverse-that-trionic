@@ -228,8 +228,18 @@ namespace T7Tool
                         break;
                     }
                 case T7Flasher.FlashStatus.NoSuchFile: flashStatusLabel.Text = "No such file"; break;
-                case T7Flasher.FlashStatus.EraseError: flashStatusLabel.Text = "Erase error"; break;
-                case T7Flasher.FlashStatus.WriteError: flashStatusLabel.Text = "Write error"; break;
+                case T7Flasher.FlashStatus.EraseError:
+                    {
+                        flashStartButton.Enabled = true;
+                        flashStatusLabel.Text = "Erase error";
+                        break;
+                    }
+                case T7Flasher.FlashStatus.WriteError:
+                    {
+                        flashStatusLabel.Text = "Write error";
+                        flashStartButton.Enabled = true;
+                        break;
+                    }
             }
         }
 
@@ -257,6 +267,14 @@ namespace T7Tool
                 kwpHandler.closeDevice();
                 return;
             }
+
+            populateECUTab();
+            
+
+        }
+
+        private void populateECUTab()
+        {
             string vin;
             string immo;
             string engineType;
@@ -279,8 +297,6 @@ namespace T7Tool
             if (res == KWPResult.OK)
                 ecuSWVerTextBox.Text = swVersion;
             flashStartButton.Enabled = true;
-            
-
         }
 
         private T7FileHeader t7InfoHeader = null;
