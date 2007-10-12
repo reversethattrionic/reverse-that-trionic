@@ -42,7 +42,9 @@ namespace T7Tool.KWP
 
         public bool closeDevice()
         {
-            return m_kwpDevice.close();
+            if(m_kwpDevice != null)
+                return m_kwpDevice.close();
+            return false;
         }
 
         /// <summary>

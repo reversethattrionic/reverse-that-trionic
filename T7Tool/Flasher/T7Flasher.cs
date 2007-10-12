@@ -57,7 +57,6 @@ namespace T7Tool.Flasher
                 m_endThread = true;
             }
             m_resetEvent.Set();
-            m_thread.Join();
         }
 
         public void readFlash(string a_fileName)
