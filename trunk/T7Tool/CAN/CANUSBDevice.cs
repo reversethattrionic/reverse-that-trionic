@@ -68,34 +68,33 @@ namespace T7Tool.KWP
 
         override public OpenResult open()
         {
-            LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
+            close();
             //Check if P bus is connected
             m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
             LAWICEL.CAN_BAUD_500K,
             LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
             LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
             LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (waitForMessage(0x280, 5000, out msg) != 0)
+            if (boxIsThere())
             {
                 m_readThread.Start();
                 return OpenResult.OK;
             }
-            int res = LAWICEL.canusb_Close(m_deviceHandle);
-
+            
             //P bus not connected
             //Check if I bus is connected
+            close();
             m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
                 "0xcb:0x9a",
                 LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
                 LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
                 LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (waitForMessage(0x280, 5000, out msg) != 0)
+            if (boxIsThere())
             {
                 m_readThread.Start();
                 return OpenResult.OK;
             }
-            res = LAWICEL.canusb_Close(m_deviceHandle);
-
+            close();
             return OpenResult.OpenError;
         }
 
@@ -163,6 +162,35 @@ namespace T7Tool.KWP
             }
             r_canMsg = new LAWICEL.CANMsg(); 
             return 0;
+        }
+
+        private bool boxIsThere()
+        {
+            LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
+            if (waitForMessage(0x280, 2000, out msg) != 0)
+                return true;
+            if (sendWriteRequest())
+                return true;
+
+            return false;
+        }
+
+        private bool sendWriteRequest()
+        {
+            CANMessage msg1 = new CANMessage(0x240, 0, 8);
+            CANMessage msg2 = new CANMessage(0x240, 0, 8);
+            LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
+
+            msg1.setData(0x000000003408A141);
+            msg2.setData(0x00000000B007A100);
+
+            if (!sendMessage(msg1))
+                return false;
+            if (!sendMessage(msg2))
+                return false;
+            if(waitForMessage(0x258, 5000, out msg) == 0x258)
+                return false;
+            return true;
         }
 
        
