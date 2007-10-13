@@ -4,13 +4,26 @@ using System.Text;
 
 namespace T7Tool.KWP
 {
+    /// <summary>
+    /// KWPRequst represents a KWP request message (see KWPCANDevice for description of KWP).
+    /// </summary>
     class KWPRequest
     {
 
         byte[] m_request;
         uint m_nrOfPid;
 
+        /// <summary>
+        /// Get the number of PIDs in this KWPRequest.
+        /// </summary>
+        /// <returns>The number of PIDs.</returns>
         public uint getNrOfPID() { return m_nrOfPid; }
+
+        /// <summary>
+        /// Constructor for request with one PID.
+        /// </summary>
+        /// <param name="a_mode">The mode.</param>
+        /// <param name="a_pid">The PID.</param>
         public KWPRequest(byte a_mode, byte a_pid)
         {
             int i = 0;
@@ -22,6 +35,11 @@ namespace T7Tool.KWP
             m_nrOfPid = 1;
         }
 
+        /// <summary>
+        /// Constructor for requests with no PID.
+        /// </summary>
+        /// <param name="a_mode">The mode.</param>
+        /// <param name="a_data">The data.</param>
         public KWPRequest(byte a_mode, byte[] a_data)
         {
             int i = 0;
@@ -35,6 +53,10 @@ namespace T7Tool.KWP
             m_nrOfPid = 0;
         }
 
+        /// <summary>
+        /// Constructor for requests with no PID and no data.
+        /// </summary>
+        /// <param name="a_mode">The mode.</param>
         public KWPRequest(byte a_mode)
         {
             int i = 0;
@@ -46,6 +68,12 @@ namespace T7Tool.KWP
             m_nrOfPid = 0;
         }
 
+        /// <summary>
+        /// Constructor for requests with one PID and data.
+        /// </summary>
+        /// <param name="a_mode">The mode.</param>
+        /// <param name="a_pid">The PID.</param>
+        /// <param name="a_data">The data.</param>
         public KWPRequest(byte a_mode, byte a_pid, byte[] a_data)
         {
             int i = 0;
@@ -60,6 +88,13 @@ namespace T7Tool.KWP
             m_nrOfPid = 1;
         }
 
+        /// <summary>
+        /// Constructor for requests with two PIDs.
+        /// </summary>
+        /// <param name="a_mode">The mode.</param>
+        /// <param name="a_pidHigh">The high PID (the first PID).</param>
+        /// <param name="a_pidLow">The low PID (the second PID).</param>
+        /// <param name="a_data">The data.</param>
         public KWPRequest(byte a_mode, byte a_pidHigh, byte a_pidLow, byte[] a_data)
         {
             int i = 0;
@@ -74,6 +109,10 @@ namespace T7Tool.KWP
             m_nrOfPid = 2;
         }
 
+        /// <summary>
+        /// Get the KWPRequest represented as a byte array.
+        /// </summary>
+        /// <returns>Byte array representing the KWPRequest.</returns>
         public byte[] getData() { return m_request; }
     }
 }

@@ -7,9 +7,16 @@ using System.Threading;
 
 namespace T7Tool.Flasher
 {
+    /// <summary>
+    /// T7Flasher handles reading and writing of flash in Trionic 7 ECUs.
+    /// 
+    /// To use this class a KWPHandler must be set for the communication.
+    /// </summary>
     class T7Flasher
     {
-
+        /// <summary>
+        /// FlashCommand is a representation of the commands for this class.
+        /// </summary>
         public enum FlashCommand
         {
             ReadCommand,
@@ -18,6 +25,10 @@ namespace T7Tool.Flasher
             NoCommand
         };
 
+
+        /// <summary>
+        /// FlashStatus is used for reporting the current status a flashing session.
+        /// </summary>
         public enum FlashStatus
         {
             Reading,
@@ -30,9 +41,22 @@ namespace T7Tool.Flasher
             WriteError
         }
 
-
+        /// <summary>
+        /// This method returns the current status of this class.
+        /// </summary>
+        /// <returns>FlashStatus</returns>
         public FlashStatus getStatus() { return m_flashStatus; }
+
+        /// <summary>
+        /// This method returns the number of bytes that has been read or written so far.
+        /// 0 is returned if there is no read or write session ongoing.
+        /// </summary>
+        /// <returns>Number of bytes that has been read or written.</returns>
         public int getNrOfBytesRead() { return m_nrOfBytesRead; }
+
+        /// <summary>
+        /// This method interrupts ongoing read or write session.
+        /// </summary>
         public void stopFlasher()
         {
             lock (m_synchObject)
@@ -41,6 +65,10 @@ namespace T7Tool.Flasher
             }
         }
 
+        /// <summary>
+        /// Constructor for T7Flasher.
+        /// </summary>
+        /// <param name="a_kwpHandler">The KWPHandler to be used for the communication.</param>
         public T7Flasher(KWPHandler a_kwpHandler)
         {
             m_kwpHandler = a_kwpHandler;
@@ -50,6 +78,9 @@ namespace T7Tool.Flasher
             m_thread.Start();
         }
 
+        /// <summary>
+        /// Destructor.
+        /// </summary>
         ~T7Flasher()
         {
             lock (m_synchObject)
@@ -59,6 +90,10 @@ namespace T7Tool.Flasher
             m_resetEvent.Set();
         }
 
+        /// <summary>
+        /// This method starts a reading session.
+        /// </summary>
+        /// <param name="a_fileName">Name of the file where the flash contents is saved.</param>
         public void readFlash(string a_fileName)
         {
             lock (m_synchObject)
@@ -69,6 +104,10 @@ namespace T7Tool.Flasher
             m_resetEvent.Set();
         }
 
+        /// <summary>
+        /// This method starts writing to flash.
+        /// </summary>
+        /// <param name="a_fileName">The name of the file from where to read the data from.</param>
         public void writeFlash(string a_fileName)
         {
             lock (m_synchObject)
@@ -79,6 +118,11 @@ namespace T7Tool.Flasher
             m_resetEvent.Set();
         }
 
+        /// <summary>
+        /// The run method handles writing and reading. It waits for a command to start read
+        /// or write and handles this command until it's completed, stopped or until there is 
+        /// a failure.
+        /// </summary>
         private void run()
         {
             bool gotSequrityAccess = false;
@@ -108,8 +152,9 @@ namespace T7Tool.Flasher
                         }
                     }
                 }
-                //if (!gotSequrityAccess)
-                 //   continue;
+                //Here it would make sense to stop if we didn't ge security acces but
+                //let's try anyway. It could be that we don't get a possitive reply from the 
+                //ECU if we alredy have security access (from a previous, interrupted, session).
                 if (m_command == FlashCommand.ReadCommand)
                 {
                     int nrOfBytes = 64;

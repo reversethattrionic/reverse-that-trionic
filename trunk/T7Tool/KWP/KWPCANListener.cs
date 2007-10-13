@@ -6,6 +6,9 @@ using T7Tool.CAN;
 
 namespace T7Tool.KWP
 {
+    /// <summary>
+    /// KWPCANListener is used by the KWPCANDevice for listening for CAN messages.
+    /// </summary>
     class KWPCANListener : ICANListener
     {
         private CANMessage m_canMessage = new CANMessage();

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace T7Tool.KWP
 {
+    /// <summary>
+    /// KWPResult represents the result returned by the request methods.
+    /// </summary>
     enum KWPResult
     {
         OK,
@@ -12,34 +15,65 @@ namespace T7Tool.KWP
         DeviceNotConnected
     }
 
+    /// <summary>
+    /// KWPHandler implements messages for the KWP2000 (Key Word Protocol 2000) protocol (also called
+    /// ISO 14230-4). Not all messages are implemented.
+    /// </summary>
     class KWPHandler
     {
+        /// <summary>
+        /// IKWPDevice to be used by KWPHandler.
+        /// </summary>
         IKWPDevice m_kwpDevice;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="a_kwpDevice">IKWPDevice to be used by KWPHandler.</param>
         public KWPHandler(IKWPDevice a_kwpDevice)
         {
             m_kwpDevice = a_kwpDevice;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public KWPHandler()
         {
         }
 
+        /// <summary>
+        /// This method sets the IKWPDevice to be used for the communication.
+        /// </summary>
+        /// <param name="a_device">IKWPDevice.</param>
         public void setKWPDevice(IKWPDevice a_device)
         {
             m_kwpDevice = a_device;
         }
 
+        /// <summary>
+        /// This method starts a KWP session. It must be called before any request can be made.
+        /// </summary>
+        /// <returns>true on success, otherwise false.</returns>
         public bool startSession()
         {
             return m_kwpDevice.startSession();
         }
 
+        /// <summary>
+        /// This method opens the IKWPDevice used for communication.
+        /// Device must be opened before any requests can be made.
+        /// </summary>
+        /// <returns>true on success, otherwise false.</returns>
         public bool openDevice()
         {
             return m_kwpDevice.open();
         }
 
+        /// <summary>
+        /// This method closes the IKWPDevice used for communication.
+        /// </summary>
+        /// <returns>true on success, otherwise false.</returns>
         public bool closeDevice()
         {
             if(m_kwpDevice != null)
@@ -98,6 +132,11 @@ namespace T7Tool.KWP
             return false;
         }
 
+        /// <summary>
+        /// This method sends a request for the VIN (Vehicle ID Number).
+        /// </summary>
+        /// <param name="r_vin">The requested VIN.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult getVIN(out string r_vin)
         {
             KWPReply reply = new KWPReply();
@@ -115,6 +154,11 @@ namespace T7Tool.KWP
             }
         }
 
+        /// <summary>
+        /// This method sends a request for the immobilizer ID.
+        /// </summary>
+        /// <param name="r_immo">The requested immo ID.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult getImmo(out string r_immo)
         {
             KWPReply reply = new KWPReply();
@@ -124,7 +168,11 @@ namespace T7Tool.KWP
             return result;
         }
 
-
+        /// <summary>
+        /// This method sends a request for the software part number.
+        /// </summary>
+        /// <param name="r_swPartNo">The requested sofware part number.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult getSwPartNumber(out string r_swPartNo)
         {
             KWPReply reply = new KWPReply();
@@ -134,6 +182,11 @@ namespace T7Tool.KWP
             return result;
         }
 
+        /// <summary>
+        /// This method sends a request for the software version.
+        /// </summary>
+        /// <param name="r_swVersion">The requested software version.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult getSwVersion(out string r_swVersion)
         {
             KWPReply reply = new KWPReply();
@@ -143,6 +196,11 @@ namespace T7Tool.KWP
             return result;
         }
 
+        /// <summary>
+        /// This method sends a request for the engine type description.
+        /// </summary>
+        /// <param name="r_swVersion">The requested engine type description.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult getEngineType(out string r_swVersion)
         {
             KWPReply reply = new KWPReply();
@@ -154,6 +212,7 @@ namespace T7Tool.KWP
 
         /// <summary>
         /// sendEraseRequest sends an erase request to the ECU.
+        /// This method must be called before the ECU can be flashed.
         /// </summary>
         /// <returns>KWPResult</returns>
         public KWPResult sendEraseRequest()
@@ -198,6 +257,13 @@ namespace T7Tool.KWP
             return result;
         }
 
+        /// <summary>
+        /// This method sets up the address and length for writing to flash. It must be called before
+        /// the sendWriteDataRequest method is called.
+        /// </summary>
+        /// <param name="a_address">The addres to start writing to.</param>
+        /// <param name="a_length">The length to write</param>
+        /// <returns>KWPResult</returns>
         public KWPResult sendWriteRequest(uint a_address, uint a_length)
         {
             KWPReply reply = new KWPReply();
@@ -225,6 +291,11 @@ namespace T7Tool.KWP
                 return result;
         }
 
+        /// <summary>
+        /// This method send data to be written to flash. sendWriteRequest must be called before this method.
+        /// </summary>
+        /// <param name="a_data">The data to be written.</param>
+        /// <returns>KWPResult</returns>
         public KWPResult sendWriteDataRequest(byte[] a_data)
         {
             KWPReply reply = new KWPReply();
@@ -242,6 +313,12 @@ namespace T7Tool.KWP
                 return result;
         }
 
+        /// <summary>
+        /// This method send a request for reading from flash. It sets up start address and the length to read.
+        /// </summary>
+        /// <param name="a_address">The address to start reading from.</param>
+        /// <param name="a_length">The total length to read.</param>
+        /// <returns></returns>
         public bool sendReadRequest(uint a_address, uint a_length)
         {
             KWPReply reply = new KWPReply();
@@ -261,6 +338,11 @@ namespace T7Tool.KWP
                 return false;
         }
 
+        /// <summary>
+        /// This method sends a request to exit data transfer exit. It should be called when a 
+        /// read session has been finished.
+        /// </summary>
+        /// <returns>true on success, otherwise false.</returns>
         public bool sendDataTransferExitRequest()
         {
             KWPReply reply = new KWPReply();
@@ -272,6 +354,12 @@ namespace T7Tool.KWP
                 return false;
         }
 
+        /// <summary>
+        /// This method send a request to receive data from flash. The sendReadRequest
+        /// method must be called before this.
+        /// </summary>
+        /// <param name="r_data">The requested data.</param>
+        /// <returns></returns>
         public bool sendDataTransferRequest(out byte[] r_data)
         {
             KWPReply reply = new KWPReply();
@@ -284,6 +372,12 @@ namespace T7Tool.KWP
                 return false;
         }
 
+        /// <summary>
+        /// This method sends a KWPRequest and returns a KWPReply.
+        /// </summary>
+        /// <param name="a_request">The request.</param>
+        /// <param name="a_reply">The reply.</param>
+        /// <returns>KWPResult</returns>
         private KWPResult sendRequest(KWPRequest a_request, out KWPReply a_reply)
         {
             KWPReply reply = new KWPReply();
@@ -299,6 +393,11 @@ namespace T7Tool.KWP
                 return KWPResult.Timeout;
         }
 
+        /// <summary>
+        /// Helper method for transforming the information in a KWPReply to a string.
+        /// </summary>
+        /// <param name="a_reply">The KWPReply.</param>
+        /// <returns>A string representing the information in the a_reply.</returns>
         private string getString(KWPReply a_reply)
         {
             Encoding ascii = Encoding.ASCII;
