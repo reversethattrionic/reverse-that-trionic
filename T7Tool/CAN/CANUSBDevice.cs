@@ -6,7 +6,17 @@ using T7Tool.CAN;
 
 namespace T7Tool.KWP
 {
-
+    /// <summary>
+    /// CANUSBDevice is an implementation of ICANDevice for the Lawicel CANUSB device
+    /// (www.canusb.com). 
+    /// In this implementation the open method autmatically detects if the device is connected
+    /// to a T7 I-bus or P-bus. The autodetection is primarily done by listening for the 0x280
+    /// message (sent on both busses) but if the device is started after an interrupted flashing
+    /// session there is no such message available on the bus. There fore the open method sends
+    /// a message to set address and length for flashing. If there is a reply there is connection.
+    /// 
+    /// All incomming messages are published to registered ICANListeners.
+    /// </summary>
     class CANUSBDevice : ICANDevice
     {
 
@@ -15,11 +25,17 @@ namespace T7Tool.KWP
         Object m_synchObject = new Object();
         bool m_endThread = false;
 
+        /// <summary>
+        /// Constructor for CANUSBDevice.
+        /// </summary>
         public CANUSBDevice()
         {
             m_readThread = new Thread(readMessages);
         }
 
+        /// <summary>
+        /// Destructor for CANUSBDevice.
+        /// </summary>
         ~CANUSBDevice()
         {
             lock (m_synchObject)
@@ -29,7 +45,10 @@ namespace T7Tool.KWP
             close();
         }
 
-
+        /// <summary>
+        /// readMessages is the "run" method of this class. It reads all incomming messages
+        /// and publishes them to registered ICANListeners.
+        /// </summary>
         public void readMessages()
         {
             int readResult = 0;
@@ -65,6 +84,14 @@ namespace T7Tool.KWP
             }
         }
 
+        /// <summary>
+        /// The open method tries to connect to both busses to see if one of them is connected and
+        /// active. The first strategy is to listen for the 0x280 message. If this fails there is a
+        /// check to see if the application is started after an interrupted flash session. This is
+        /// done by sending a message to set address and length.
+        /// </summary>
+        /// <returns>OpenResult.OK is returned on success. Otherwise OpenResult.OpenError is
+        /// returned.</returns>
         override public OpenResult open()
         {
             close();
@@ -97,6 +124,10 @@ namespace T7Tool.KWP
             return OpenResult.OpenError;
         }
 
+        /// <summary>
+        /// The close method closes the CANUSB device.
+        /// </summary>
+        /// <returns>CloseResult.OK on success, otherwise CloseResult.CloseError.</returns>
         override public CloseResult close()
         {
             int res = LAWICEL.canusb_Close(m_deviceHandle);
@@ -111,6 +142,10 @@ namespace T7Tool.KWP
             }
         }
 
+        /// <summary>
+        /// isOpen checks if the device is open.
+        /// </summary>
+        /// <returns>true if the device is open, otherwise false.</returns>
         override public bool isOpen()
         {
             if (m_deviceHandle > 0)
@@ -120,6 +155,11 @@ namespace T7Tool.KWP
         }
 
 
+        /// <summary>
+        /// sendMessage send a CANMessage.
+        /// </summary>
+        /// <param name="a_message">A CANMessage.</param>
+        /// <returns>true on success, othewise false.</returns>
         override public bool sendMessage(CANMessage a_message)
         {
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
@@ -137,8 +177,14 @@ namespace T7Tool.KWP
 
        
 
-
-        public uint waitForMessage(uint a_canID, uint timeout, out LAWICEL.CANMsg r_canMsg)
+        /// <summary>
+        /// waitForMessage waits for a specific CAN message give by a CAN id.
+        /// </summary>
+        /// <param name="a_canID">The CAN id to listen for</param>
+        /// <param name="timeout">Listen timeout</param>
+        /// <param name="r_canMsg">The CAN message with a_canID that we where listening for.</param>
+        /// <returns>The CAN id for the message we where listening for, otherwise 0.</returns>
+        private uint waitForMessage(uint a_canID, uint timeout, out LAWICEL.CANMsg r_canMsg)
         {
             int readResult = 0;
             int nrOfWait = 0;
@@ -161,6 +207,10 @@ namespace T7Tool.KWP
             return 0;
         }
 
+        /// <summary>
+        /// Check if there is connection with a CAN bus.
+        /// </summary>
+        /// <returns>true on connection, otherwise false</returns>
         private bool boxIsThere()
         {
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
@@ -172,6 +222,12 @@ namespace T7Tool.KWP
             return false;
         }
 
+        /// <summary>
+        /// Send a message that sets address and length for flashing and wait for a reply.
+        /// This is used to determine if there is connection to the ECU if the 0x280 message
+        /// is not available on the bus.
+        /// </summary>
+        /// <returns></returns>
         private bool sendWriteRequest()
         {
             CANMessage msg1 = new CANMessage(0x240, 0, 8);
