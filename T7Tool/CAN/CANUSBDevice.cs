@@ -106,7 +106,7 @@ namespace T7Tool.KWP
                 m_readThread.Start();
                 return OpenResult.OK;
             }
-            
+
             //P bus not connected
             //Check if I bus is connected
             close();
@@ -241,7 +241,7 @@ namespace T7Tool.KWP
         private bool boxIsThere()
         {
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
-            if (waitAnyMessage(5000, out msg) != 0)
+            if (waitAnyMessage(2000, out msg) != 0)
                 return true;
             if (sendWriteRequest())
                 return true;
@@ -251,8 +251,8 @@ namespace T7Tool.KWP
 
         /// <summary>
         /// Send a message that sets address and length for flashing and wait for a reply.
-        /// This is used to determine if there is connection to the ECU if the 0x280 message
-        /// is not available on the bus.
+        /// This is used to determine if there is connection to the ECU when there are no
+        /// cyclic messages sent on the bus.
         /// </summary>
         /// <returns></returns>
         private bool sendWriteRequest()
@@ -268,9 +268,9 @@ namespace T7Tool.KWP
                 return false;
             if (!sendMessage(msg2))
                 return false;
-            if(waitForMessage(0x258, 5000, out msg) == 0x258)
-                return false;
-            return true;
+            if(waitForMessage(0x258, 1000, out msg) == 0x258)
+                return true;
+            return false;
         }
 
        
