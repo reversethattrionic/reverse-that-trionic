@@ -208,13 +208,40 @@ namespace T7Tool.KWP
         }
 
         /// <summary>
+        /// waitAnyMessage waits for any message to be received.
+        /// </summary>
+        /// <param name="timeout">Listen timeout</param>
+        /// <param name="r_canMsg">The CAN message that was first received</param>
+        /// <returns>The CAN id for the message received, otherwise 0.</returns>
+        private uint waitAnyMessage(uint timeout, out LAWICEL.CANMsg r_canMsg)
+        {
+            int readResult = 0;
+            int nrOfWait = 0;
+            while (nrOfWait < timeout)
+            {
+                readResult = LAWICEL.canusb_Read(m_deviceHandle, out r_canMsg);
+                if (readResult == LAWICEL.ERROR_CANUSB_OK)
+                {
+                    return (uint)r_canMsg.id;
+                }
+                else if (readResult == LAWICEL.ERROR_CANUSB_NO_MESSAGE)
+                {
+                    Thread.Sleep(1);
+                    nrOfWait++;
+                }
+            }
+            r_canMsg = new LAWICEL.CANMsg();
+            return 0;
+        }
+
+        /// <summary>
         /// Check if there is connection with a CAN bus.
         /// </summary>
         /// <returns>true on connection, otherwise false</returns>
         private bool boxIsThere()
         {
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
-            if (waitForMessage(0x280, 2000, out msg) != 0)
+            if (waitAnyMessage(5000, out msg) != 0)
                 return true;
             if (sendWriteRequest())
                 return true;
