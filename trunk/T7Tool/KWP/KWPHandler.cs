@@ -163,7 +163,10 @@ namespace T7Tool.KWP
         {
             KWPReply reply = new KWPReply();
             KWPResult result;
+            r_immo = "";
             result = sendRequest(new KWPRequest(0x1A, 0x92), out reply);
+            if (result != KWPResult.OK)
+                return result;
             r_immo = getString(reply);
             return result;
         }
@@ -191,7 +194,10 @@ namespace T7Tool.KWP
         {
             KWPReply reply = new KWPReply();
             KWPResult result;
+            r_swVersion = "";
             result = sendRequest(new KWPRequest(0x1A, 0x95), out reply);
+            if (result != KWPResult.OK)
+                return result;
             r_swVersion = getString(reply);
             return result;
         }
@@ -205,7 +211,10 @@ namespace T7Tool.KWP
         {
             KWPReply reply = new KWPReply();
             KWPResult result;
+            r_swVersion = "";
             result = sendRequest(new KWPRequest(0x1A, 0x97), out reply);
+            if (result != KWPResult.OK)
+                return result;
             r_swVersion = getString(reply);
             return result;
         }
@@ -227,6 +236,8 @@ namespace T7Tool.KWP
             //PID = 0x52
             //Expected result is 0x71
             result = sendRequest(new KWPRequest(0x31, 0x52), out reply);
+            if (result != KWPResult.OK)
+                return result;
             while (reply.getMode() != 0x71) 
             {
                 System.Threading.Thread.Sleep(1000);
@@ -242,6 +253,8 @@ namespace T7Tool.KWP
             //Expected result is 0x71
             i = 0;
             result = sendRequest(new KWPRequest(0x31, 0x53), out reply2);
+            if (result != KWPResult.OK)
+                return result;
             while (reply2.getMode() != 0x71)
             {
                 System.Threading.Thread.Sleep(1000);
@@ -285,6 +298,8 @@ namespace T7Tool.KWP
             //Data = aaallll (aaa = address, llll = length)
             //Expected result = 0x74
             result = sendRequest(new KWPRequest(0x34, addressAndLength), out reply);
+            if (result != KWPResult.OK)
+                return result;
             if (reply.getMode() != 0x74)
                 return KWPResult.NOK;
             else
