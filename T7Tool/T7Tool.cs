@@ -220,6 +220,12 @@ namespace T7Tool
                         flashStartButton.Enabled = false;
                         break;
                     }
+                case T7Flasher.FlashStatus.Eraseing:
+                    {
+                        flashStatusLabel.Text = "Eraseing";
+                        flashStartButton.Enabled = false;
+                        break;
+                    }
                 case T7Flasher.FlashStatus.NoSequrityAccess: flashStatusLabel.Text = "No security access"; break;
                 case T7Flasher.FlashStatus.DoinNuthin:
                     {

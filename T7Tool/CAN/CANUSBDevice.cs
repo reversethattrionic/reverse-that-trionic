@@ -103,23 +103,12 @@ namespace T7Tool.KWP
             LAWICEL.CANUSB_FLAG_TIMESTAMP);
             if (boxIsThere())
             {
-                m_readThread.Start();
+                if(m_readThread.ThreadState == ThreadState.Unstarted)
+                    m_readThread.Start();
                 return OpenResult.OK;
             }
 
-            //P bus not connected
-            //Check if I bus is connected
-            close();
-            m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
-                "0xcb:0x9a",
-                LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
-                LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
-                LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (boxIsThere())
-            {
-                m_readThread.Start();
-                return OpenResult.OK;
-            }
+
             close();
             return OpenResult.OpenError;
         }
@@ -243,33 +232,34 @@ namespace T7Tool.KWP
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
             if (waitAnyMessage(2000, out msg) != 0)
                 return true;
-            if (sendWriteRequest())
+            if (sendSessionRequest())
                 return true;
 
             return false;
         }
 
         /// <summary>
-        /// Send a message that sets address and length for flashing and wait for a reply.
-        /// This is used to determine if there is connection to the ECU when there are no
-        /// cyclic messages sent on the bus.
+        /// Send a message that starts a session. This is used to test if there is 
+        /// a connection.
         /// </summary>
         /// <returns></returns>
-        private bool sendWriteRequest()
+        private bool sendSessionRequest()
         {
-            CANMessage msg1 = new CANMessage(0x240, 0, 8);
-            CANMessage msg2 = new CANMessage(0x240, 0, 8);
+            CANMessage msg1 = new CANMessage(0x220, 0, 8);
             LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
-
-            msg1.setData(0x000000003408A141);
-            msg2.setData(0x00000000B007A100);
+            msg1.setData(0x000040021100813f);
 
             if (!sendMessage(msg1))
                 return false;
-            if (!sendMessage(msg2))
-                return false;
-            if(waitForMessage(0x258, 1000, out msg) == 0x258)
+            if (waitForMessage(0x238, 1000, out msg) == 0x238)
+            {
+                //Ok, there seems to be a ECU somewhere out there.
+                //Now, sleep for 10 seconds to get a session timeout. This is needed for
+                //applications on higher level. Otherwise there will be no reply when the
+                //higher level application tries to start a session.
+                Thread.Sleep(10000);
                 return true;
+            }
             return false;
         }
 

@@ -33,6 +33,7 @@ namespace T7Tool.Flasher
         {
             Reading,
             Writing,
+            Eraseing,
             NoSequrityAccess,
             DoinNuthin,
             Completed,
@@ -194,12 +195,12 @@ namespace T7Tool.Flasher
                     int nrOfBytes = 128;
                     int i = 0;
                     byte[] data = new byte[nrOfBytes];
-                    m_flashStatus = FlashStatus.Writing;
                     if (!File.Exists(m_fileName))
                     {
                         m_flashStatus = FlashStatus.NoSuchFile;
                         continue;
                     }
+                    m_flashStatus = FlashStatus.Eraseing;
                     if (m_kwpHandler.sendEraseRequest() != KWPResult.OK)
                     {
                         m_flashStatus = FlashStatus.EraseError;
@@ -207,6 +208,7 @@ namespace T7Tool.Flasher
                     }
                     FileStream fs = new FileStream(m_fileName, FileMode.Open, FileAccess.Read);
 
+                    m_flashStatus = FlashStatus.Writing;
                     //Write 0x0-0x7B000
                     if (m_kwpHandler.sendWriteRequest(0x0, 0x7B000) != KWPResult.OK)
                     {
