@@ -108,6 +108,19 @@ namespace T7Tool.KWP
                 return OpenResult.OK;
             }
 
+            //P bus not connected
+            //Check if I bus is connected
+            close();
+            m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
+                "0xcb:0x9a",
+                LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
+                LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
+                LAWICEL.CANUSB_FLAG_TIMESTAMP);
+            if (boxIsThere())
+            {
+                m_readThread.Start();
+                return OpenResult.OK;
+            }
 
             close();
             return OpenResult.OpenError;
