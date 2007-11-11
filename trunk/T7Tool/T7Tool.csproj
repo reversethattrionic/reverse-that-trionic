@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>T7Tool</ProductName>
-    <PublisherName>Patrik Servin</PublisherName>
+    <PublisherName>T7Tool</PublisherName>
     <AutorunEnabled>true</AutorunEnabled>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <BootstrapperEnabled>true</BootstrapperEnabled>
