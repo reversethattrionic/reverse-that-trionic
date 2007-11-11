@@ -86,15 +86,31 @@ namespace T7Tool.KWP
 
         /// <summary>
         /// The open method tries to connect to both busses to see if one of them is connected and
-        /// active. The first strategy is to listen for the 0x280 message. If this fails there is a
+        /// active. The first strategy is to listen for any CAN message. If this fails there is a
         /// check to see if the application is started after an interrupted flash session. This is
-        /// done by sending a message to set address and length.
+        /// done by sending a message to set address and length (only for P-bus).
         /// </summary>
         /// <returns>OpenResult.OK is returned on success. Otherwise OpenResult.OpenError is
         /// returned.</returns>
         override public OpenResult open()
         {
+            LAWICEL.CANMsg msg = new LAWICEL.CANMsg();
+            //Check if I bus is connected
             close();
+            m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
+                "0xcb:0x9a",
+                LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
+                LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
+                LAWICEL.CANUSB_FLAG_TIMESTAMP);
+            if (waitAnyMessage(1000, out msg) != 0)
+            {
+                if (m_readThread.ThreadState == ThreadState.Unstarted)
+                    m_readThread.Start();
+                return OpenResult.OK;
+            }
+            close();
+
+            //I bus wasn't connected.
             //Check if P bus is connected
             m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
             LAWICEL.CAN_BAUD_500K,
@@ -105,20 +121,6 @@ namespace T7Tool.KWP
             {
                 if(m_readThread.ThreadState == ThreadState.Unstarted)
                     m_readThread.Start();
-                return OpenResult.OK;
-            }
-
-            //P bus not connected
-            //Check if I bus is connected
-            close();
-            m_deviceHandle = LAWICEL.canusb_Open(IntPtr.Zero,
-                "0xcb:0x9a",
-                LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
-                LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
-                LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (boxIsThere())
-            {
-                m_readThread.Start();
                 return OpenResult.OK;
             }
 
