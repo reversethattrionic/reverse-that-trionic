@@ -9,8 +9,9 @@
     </UpdateUrlHistory>
     <BootstrapperUrlHistory>
     </BootstrapperUrlHistory>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>15</ApplicationRevision>
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
+    <ReferencePath>D:\users\patrik\project\subversion\T7Tool\HexEdit\Be.Windows.Forms.HexBox\;D:\users\patrik\project\subversion\T7Tool\HexEdit\</ReferencePath>
   </PropertyGroup>
 </Project>
