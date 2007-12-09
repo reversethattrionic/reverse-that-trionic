@@ -9,12 +9,23 @@ using System.IO;
 using T7Tool.KWP;
 using T7Tool.CAN;
 using T7Tool.Flasher;
+using T7Tool.Forms;
 using System.Threading;
 
 namespace T7Tool
 {
     public partial class T7Tool : Form
     {
+        private Forms.RealTimeSymbolForm realTimeSymbolForm;
+        private T7FileHeader t7InfoHeader = null;
+        private CANUSBDevice canUsbDevice = null;
+        private KWPCANDevice kwpCanDevice = null;
+        private KWPHandler kwpHandler = null;
+        private T7Flasher m_t7Flasher = null;
+        private string m_fileName;
+        private TimerCallback timerDelegate;
+        private System.Threading.Timer stateTimer;
+        private bool m_connectedToECU = false;
 
         public T7Tool()
         {
@@ -23,11 +34,8 @@ namespace T7Tool
             t7InfoHeader = new T7FileHeader();
             canUsbDevice = new CANUSBDevice();
             kwpCanDevice = new KWPCANDevice();
-            kwpHandler = new KWPHandler();
-            m_t7Flasher = new T7Flasher(kwpHandler);
 
             timerDelegate = new TimerCallback(this.flasherInfo);
-            stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 1000, 250);
             flashDownLoadButton.Select();
             flashStartButton.Enabled = false;
             kwpDeviceComboBox.SelectedItem = "Lawicel CANUSB";
@@ -251,11 +259,15 @@ namespace T7Tool
 
         private void kwpDeviceOpenButton_Click(object sender, EventArgs e)
         {
+
             kwpDeviceConnectionStatus.Text = "Connecting";
             if (kwpDeviceComboBox.SelectedItem.ToString() == "Lawicel CANUSB")
             {
                 kwpCanDevice.setCANDevice(canUsbDevice);
-                kwpHandler.setKWPDevice(kwpCanDevice);
+                KWPHandler.setKWPDevice(kwpCanDevice);
+                kwpHandler = KWPHandler.getInstance();
+                T7Flasher.setKWPHandler(kwpHandler);
+                m_t7Flasher = T7Flasher.getInstance();
             }
             if (kwpHandler.openDevice())
                 kwpDeviceConnectionStatus.Text = "Open";
@@ -273,9 +285,9 @@ namespace T7Tool
                 kwpHandler.closeDevice();
                 return;
             }
-
+            m_connectedToECU = true;
+            stateTimer = new System.Threading.Timer(timerDelegate, new Object(), 0, 250);
             populateECUTab();
-            
 
         }
 
@@ -305,14 +317,6 @@ namespace T7Tool
             flashStartButton.Enabled = true;
         }
 
-        private T7FileHeader t7InfoHeader = null;
-        private CANUSBDevice canUsbDevice = null;
-        private KWPCANDevice kwpCanDevice = null;
-        private KWPHandler kwpHandler = null;
-        private T7Flasher m_t7Flasher = null;
-        private string m_fileName;
-        private TimerCallback timerDelegate;
-        private System.Threading.Timer stateTimer;
 
         private void flashStartButton_Click(object sender, EventArgs e)
         {
@@ -362,6 +366,7 @@ namespace T7Tool
 
         private void exitApplication()
         {
+            KWPHandler.stopLogging();
             kwpHandler.closeDevice();
             t7InfoHeader = null;
             canUsbDevice = null;
@@ -373,6 +378,55 @@ namespace T7Tool
             stateTimer = null;
             Application.Exit();
             Environment.Exit(0);
+        }
+
+        private void DownloadRAMButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void downLoadSymbolTableFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
+           // m_t7Flasher.readMemory(downLoadSymbolTableFileDialog.FileName, (uint)kwpHandler.getSymbolTableOffset(), );
+        }
+
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void kWPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (kWPToolStripMenuItem.Checked)
+                KWPHandler.startLogging();
+            else
+                KWPHandler.stopLogging();
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void fileInfoPage_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void eCUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!m_connectedToECU)
+            {
+                InfoFormOK infoForm = new InfoFormOK("Unable to perform. ECU not connected");
+                infoForm.Show();
+                return;
+            }
+            if(realTimeSymbolForm == null)
+                realTimeSymbolForm = new RealTimeSymbolForm();
+            realTimeSymbolForm.Show();
         }
 
     }

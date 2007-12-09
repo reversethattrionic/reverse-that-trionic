@@ -32,6 +32,10 @@ namespace T7Tool
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tuneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.eCUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LogStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.kWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutT7ToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ECUTabControl = new System.Windows.Forms.TabControl();
@@ -101,12 +105,15 @@ namespace T7Tool
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
+            this.tuneToolStripMenuItem,
+            this.LogStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(436, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -122,6 +129,38 @@ namespace T7Tool
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // tuneToolStripMenuItem
+            // 
+            this.tuneToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.eCUToolStripMenuItem});
+            this.tuneToolStripMenuItem.Name = "tuneToolStripMenuItem";
+            this.tuneToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
+            this.tuneToolStripMenuItem.Text = "Tune";
+            // 
+            // eCUToolStripMenuItem
+            // 
+            this.eCUToolStripMenuItem.Name = "eCUToolStripMenuItem";
+            this.eCUToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.eCUToolStripMenuItem.Text = "ECU";
+            this.eCUToolStripMenuItem.Click += new System.EventHandler(this.eCUToolStripMenuItem_Click);
+            // 
+            // LogStripMenuItem
+            // 
+            this.LogStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.kWPToolStripMenuItem});
+            this.LogStripMenuItem.Name = "LogStripMenuItem";
+            this.LogStripMenuItem.Size = new System.Drawing.Size(36, 20);
+            this.LogStripMenuItem.Text = "Log";
+            this.LogStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // kWPToolStripMenuItem
+            // 
+            this.kWPToolStripMenuItem.CheckOnClick = true;
+            this.kWPToolStripMenuItem.Name = "kWPToolStripMenuItem";
+            this.kWPToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.kWPToolStripMenuItem.Text = "KWP";
+            this.kWPToolStripMenuItem.Click += new System.EventHandler(this.kWPToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -166,6 +205,7 @@ namespace T7Tool
             this.fileInfoPage.TabIndex = 0;
             this.fileInfoPage.Text = "T7 File";
             this.fileInfoPage.UseVisualStyleBackColor = true;
+            this.fileInfoPage.Click += new System.EventHandler(this.fileInfoPage_Click_1);
             // 
             // fileNameLabel
             // 
@@ -809,6 +849,10 @@ namespace T7Tool
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.RadioButton flashWriteButton;
         private System.Windows.Forms.SaveFileDialog flashFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem LogStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem kWPToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tuneToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem eCUToolStripMenuItem;
     }
 }
 

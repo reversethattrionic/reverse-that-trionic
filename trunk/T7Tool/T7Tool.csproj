@@ -49,6 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Be.Windows.Forms.HexBox, Version=1.2.0.14173, Culture=neutral, PublicKeyToken=e0e5adf0ebc99863" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -68,6 +69,30 @@
     <Compile Include="CAN\ICANDevice.cs" />
     <Compile Include="ChecksumHandler.cs" />
     <Compile Include="CAN\CANUSBDevice.cs" />
+    <Compile Include="Forms\InfoFormOK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InfoFormOK.Designer.cs">
+      <DependentUpon>InfoFormOK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InfoFormStatic.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InfoFormStatic.Designer.cs">
+      <DependentUpon>InfoFormStatic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Parser\Symbol.cs" />
+    <Compile Include="Parser\SymbolMapParser.cs" />
+    <Compile Include="Parser\T7FileParser.cs" />
+    <Compile Include="Flasher\T7Flasher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Forms\RealTimeSymbolForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RealTimeSymbolForm.Designer.cs">
+      <DependentUpon>RealTimeSymbolForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="KWP\KWPCANDevice.cs" />
     <Compile Include="KWP\IKWPDevice.cs" />
     <Compile Include="KWP\KWPCANListener.cs" />
@@ -76,7 +101,6 @@
     <Compile Include="KWP\KWPRequest.cs" />
     <Compile Include="CAN\Lawicel_canusb.cs" />
     <Compile Include="T7FileHeader.cs" />
-    <Compile Include="Flasher\T7Flasher.cs" />
     <Compile Include="T7Tool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,6 +112,18 @@
     <EmbeddedResource Include="AboutBox.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AboutBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InfoFormOK.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>InfoFormOK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InfoFormStatic.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>InfoFormStatic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RealTimeSymbolForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>RealTimeSymbolForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="T7Tool.resx">
       <SubType>Designer</SubType>
@@ -121,6 +157,9 @@
       <ProductName>.NET Framework 2.0</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DLL\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
