@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using System.Threading;
 
 namespace T7Tool.KWP
 {
@@ -24,32 +26,39 @@ namespace T7Tool.KWP
         /// <summary>
         /// IKWPDevice to be used by KWPHandler.
         /// </summary>
-        IKWPDevice m_kwpDevice;
+        private static IKWPDevice m_kwpDevice;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="a_kwpDevice">IKWPDevice to be used by KWPHandler.</param>
-        public KWPHandler(IKWPDevice a_kwpDevice)
+        public static void setKWPDevice(IKWPDevice a_kwpDevice)
         {
             m_kwpDevice = a_kwpDevice;
+        }
+
+        public static KWPHandler getInstance()
+        {
+            if (m_kwpDevice == null)
+                throw new Exception("KWPDevice not set.");
+            if (m_instance == null)
+                m_instance = new KWPHandler();
+            return m_instance;
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public KWPHandler()
+        private KWPHandler()
         {
+            timerDelegate = new TimerCallback(this.sendKeepAlive);
         }
 
-        /// <summary>
-        /// This method sets the IKWPDevice to be used for the communication.
-        /// </summary>
-        /// <param name="a_device">IKWPDevice.</param>
-        public void setKWPDevice(IKWPDevice a_device)
+        public void sendKeepAlive(Object stateInfo)
         {
-            m_kwpDevice = a_device;
+            sendUnknownRequest();
         }
+
 
         /// <summary>
         /// This method starts a KWP session. It must be called before any request can be made.
@@ -172,6 +181,23 @@ namespace T7Tool.KWP
         }
 
         /// <summary>
+        /// This method sends a request to get the offset of the symbol table.
+        /// </summary>
+        /// <param name="r_immo">Start address of the symbol table.</param>
+        /// <returns>KWPResult</returns>
+        public KWPResult getSymbolTableOffset(out UInt16 r_offset)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            r_offset = 0;
+            result = sendRequest(new KWPRequest(0x1A, 0x9B), out reply);
+            if (result != KWPResult.OK)
+                return result;
+            r_offset = getUint16(reply);
+            return result;
+        }
+
+        /// <summary>
         /// This method sends a request for the software part number.
         /// </summary>
         /// <param name="r_swPartNo">The requested sofware part number.</param>
@@ -196,6 +222,23 @@ namespace T7Tool.KWP
             KWPResult result;
             r_swVersion = "";
             result = sendRequest(new KWPRequest(0x1A, 0x95), out reply);
+            if (result != KWPResult.OK)
+                return result;
+            r_swVersion = getString(reply);
+            return result;
+        }
+
+        /// <summary>
+        /// This method sends a request for the software version using diagnostic routine 0x51.
+        /// </summary>
+        /// <param name="r_swVersion">The requested software version.</param>
+        /// <returns>KWPResult</returns>
+        public KWPResult getSwVersionFromDR51(out string r_swVersion)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            r_swVersion = "";
+            result = sendRequest(new KWPRequest(0x31, 0x51), out reply);
             if (result != KWPResult.OK)
                 return result;
             r_swVersion = getString(reply);
@@ -329,11 +372,79 @@ namespace T7Tool.KWP
         }
 
         /// <summary>
-        /// This method send a request for reading from flash. It sets up start address and the length to read.
+        /// This method requests data to be transmitted.
+        /// </summary>
+        /// <param name="a_data">The data to be transmitted.</param>
+        /// <returns>KWPResult</returns>
+        public KWPResult sendDataTransferRequest(out byte[] a_data)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+          
+
+            //Send request
+            //Mode = 0x36
+            //PID = no PID used by this request
+            //Data = no data
+            //Expected result = 0x76
+            result = sendRequest(new KWPRequest(0x36), out reply);
+            a_data = reply.getData();
+            if (reply.getMode() != 0x76)
+                return KWPResult.NOK;
+            else
+                return result;
+        }
+
+        /// <summary>
+        /// Send unknown request
+        /// </summary>
+        /// <returns>KWPResult</returns>
+        public KWPResult sendUnknownRequest()
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+
+            //Send request
+            //Mode = 0x3E
+            //PID = no PID used by this request
+            //Expected result = 0x7E
+            result = sendRequest(new KWPRequest(0x3E), out reply);
+            if (reply.getMode() != 0x7E)
+                return KWPResult.NOK;
+            else
+                return result;
+        }
+
+        /// <summary>
+        /// This method send a request to download the symbol map.
+        /// After this request has been made data can be fetched with a data transfer request
+        /// </summary>
+        /// <param name="a_data">The data to be written.</param>
+        /// <returns>KWPResult</returns>
+        public KWPResult sendReadSymbolMapRequest()
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+
+            //Send request
+            //Mode = 0x31
+            //PID = 0x50
+            //Data = data to be flashed
+            //Expected result = 0x71
+            result = sendRequest(new KWPRequest(0x31, 0x50), out reply);
+            if (reply.getMode() != 0x71)
+                return KWPResult.NOK;
+            else
+                return result;
+        }
+
+        /// <summary>
+        /// This method send a request for reading from ECU memory (both RAM and flash). 
+        /// It sets up start address and the length to read.
         /// </summary>
         /// <param name="a_address">The address to start reading from.</param>
         /// <param name="a_length">The total length to read.</param>
-        /// <returns></returns>
+        /// <returns>true on success, otherwise false</returns>
         public bool sendReadRequest(uint a_address, uint a_length)
         {
             KWPReply reply = new KWPReply();
@@ -347,6 +458,54 @@ namespace T7Tool.KWP
             lengthAndAddress[3] = (byte)(a_address >> 8);
             lengthAndAddress[4] = (byte)(a_address);
             result = sendRequest(new KWPRequest(0x2C, 0xF0, 0x03, lengthAndAddress), out reply);
+            if (result == KWPResult.OK)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// This method send a request for reading a symbol. 
+        /// </summary>
+        /// <param name="a_address">The symbol number to read [0..0xFFFF-1].</param>
+        /// <returns></returns>
+        public bool setSymbolRequest(uint a_symbolNumber)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            byte[] symbolNumber = new byte[5];
+            //First two bytes should be zero
+            symbolNumber[0] = 0;
+            symbolNumber[1] = 0;
+            symbolNumber[2] = 0x80;
+            //set symbol number (byte 2 to 3);
+            symbolNumber[3] = (byte)(a_symbolNumber >> 8);
+            symbolNumber[4] = (byte)(a_symbolNumber);
+            result = sendRequest(new KWPRequest(0x2C, 0xF0, 0x03, symbolNumber), out reply);
+            if (result == KWPResult.OK)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// This method writes to a symbol in RAM.
+        /// The ECU must not be write protected for this to work.
+        /// </summary>
+        /// <param name="a_address">The address to start reading from [0..0xFFFF-1].</param>
+        /// <param name="a_length">The total length to read.</param>
+        /// <returns></returns>
+        public bool writeSymbolRequest(uint a_symbolNumber, byte[] a_data)
+        {
+            KWPReply reply = new KWPReply();
+            KWPResult result;
+            byte[] symbolNumberAndData = new byte[3 + a_data.Length];
+            //First two bytes should be the symbol number
+            symbolNumberAndData[0] = (byte)(a_symbolNumber >> 8);
+            symbolNumberAndData[1] = (byte)(a_symbolNumber);
+            for (int i = 2; i < symbolNumberAndData.Length; i++)
+                symbolNumberAndData[i] = a_data[i - 2];
+            result = sendRequest(new KWPRequest(0x3D, 0x80, 0x00, symbolNumberAndData), out reply);
             if (result == KWPResult.OK)
                 return true;
             else
@@ -375,7 +534,7 @@ namespace T7Tool.KWP
         /// </summary>
         /// <param name="r_data">The requested data.</param>
         /// <returns></returns>
-        public bool sendDataTransferRequest(out byte[] r_data)
+        public bool sendRequestDataByOffset(out byte[] r_data)
         {
             KWPReply reply = new KWPReply();
             KWPResult result;
@@ -385,6 +544,25 @@ namespace T7Tool.KWP
                 return true;
             else 
                 return false;
+        }
+
+        public static void startLogging()
+        {
+            DateTime dateTime = DateTime.Now;
+            String fileName = "kwplog.txt";
+            if (!File.Exists(fileName))
+                File.Create(fileName);
+            m_logFileStream = new StreamWriter(fileName);
+            m_logFileStream.WriteLine("New logging started: " + dateTime);
+            m_logFileStream.WriteLine();
+            m_logginEnabled = true;
+        }
+
+        public static void stopLogging()
+        {
+            m_logginEnabled = false;
+            if(m_logFileStream != null)
+                m_logFileStream.Close();
         }
 
         /// <summary>
@@ -398,14 +576,34 @@ namespace T7Tool.KWP
             KWPReply reply = new KWPReply();
             RequestResult result;
             a_reply = new KWPReply();
+            if(stateTimer == null)
+                stateTimer = new System.Threading.Timer(sendKeepAlive, new Object(), 1000, 1000);
+            stateTimer.Change(1000, 1000);
+            m_requestMutex.WaitOne();
             if (!m_kwpDevice.isOpen())
                 return KWPResult.DeviceNotConnected;
+            if (m_logginEnabled)
+                m_logFileStream.WriteLine(a_request.ToString());
             result = m_kwpDevice.sendRequest(a_request, out reply);
             a_reply = reply;
             if (result == RequestResult.NoError)
+            {
+                if (m_logginEnabled)
+                {
+                    m_logFileStream.WriteLine(reply.ToString());
+                    m_logFileStream.WriteLine();
+                    m_logFileStream.Flush();
+                }
+                m_requestMutex.ReleaseMutex();
                 return KWPResult.OK;
+            }
             else
+            {
+                if (m_logginEnabled)
+                    m_logFileStream.WriteLine("Timeout");
+                m_requestMutex.ReleaseMutex();
                 return KWPResult.Timeout;
+            }
         }
 
         /// <summary>
@@ -415,9 +613,18 @@ namespace T7Tool.KWP
         /// <returns>A string representing the information in the a_reply.</returns>
         private string getString(KWPReply a_reply)
         {
+            if (a_reply.getData().Length == 0)
+                return "";
             Encoding ascii = Encoding.ASCII;
             ascii.GetChars(a_reply.getData(), 0, a_reply.getData().Length);
             return ascii.GetString(a_reply.getData(), 0, a_reply.getData().Length);
+        }
+
+        private UInt16 getUint16(KWPReply a_reply)
+        {
+            UInt16 uinteger;
+            uinteger = (UInt16)((a_reply.getData()[1] << 8) | (a_reply.getData()[0]));
+            return uinteger;
         }
 
         /// <summary>
@@ -443,6 +650,13 @@ namespace T7Tool.KWP
 
             return returnKey;
         }
+
+        private static bool m_logginEnabled = false;
+        private static StreamWriter m_logFileStream;
+        private static KWPHandler m_instance;
+        private Mutex m_requestMutex = new Mutex();
+        private TimerCallback timerDelegate;
+        private System.Threading.Timer stateTimer;
 
     }
 }

@@ -184,16 +184,16 @@ namespace T7Tool.KWP
             // Receive one or several replys and send an ack for each reply.
             if (msg.getID() == 0x258)
             {
-                uint nrOfRows = nrOfRowsToRead(msg.getData());
+                uint nrOfRows = (uint)(msg.getCanData(0) & 0x3F)+ 1;
                 row = 0;
                 if (nrOfRows == 0)
                     throw new Exception("Wrong nr of rows");
-                //Assume that no KWP reply contains more than 0xFF bytes
-                byte[] reply = new byte[0xFF];
+                //Assume that no KWP reply contains more than 0x200 bytes
+                byte[] reply = new byte[0x200];
                 reply = collectReply(reply, msg.getData(), row);
                 sendAck(nrOfRows - 1);
                 nrOfRows--;
-                while ((msg.getCanData(0) & 0x0f) > 0)
+                while (nrOfRows > 0)
                 {
                     msg = m_kwpCanListener.waitForMessage(0x258, timeoutPeriod);
                     if (msg.getID() == 0x258)
