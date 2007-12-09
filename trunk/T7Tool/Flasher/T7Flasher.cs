@@ -20,6 +20,9 @@ namespace T7Tool.Flasher
         public enum FlashCommand
         {
             ReadCommand,
+            ReadMemoryCommand,
+            ReadSymbolMapCommand,
+            ReadSymbolNameCommand,
             WriteCommand,
             StopCommand, 
             NoCommand
@@ -39,7 +42,8 @@ namespace T7Tool.Flasher
             Completed,
             NoSuchFile,
             EraseError,
-            WriteError
+            WriteError,
+            ReadError
         }
 
         /// <summary>
@@ -65,14 +69,28 @@ namespace T7Tool.Flasher
                 m_command = FlashCommand.StopCommand;
             }
         }
+        public static void setKWPHandler(KWPHandler a_kwpHandler)
+        {
+            if (m_kwpHandler != null)
+                throw new Exception("KWPHandler already set");
+            m_kwpHandler = a_kwpHandler;
+        }
+
+        public static T7Flasher getInstance()
+        {
+            if(m_kwpHandler == null)
+                throw new Exception("KWPHandler not set");
+            if (m_instance == null)
+                m_instance = new T7Flasher();
+            return m_instance;
+        }
 
         /// <summary>
         /// Constructor for T7Flasher.
         /// </summary>
         /// <param name="a_kwpHandler">The KWPHandler to be used for the communication.</param>
-        public T7Flasher(KWPHandler a_kwpHandler)
+        private T7Flasher()
         {
-            m_kwpHandler = a_kwpHandler;
             m_command = FlashCommand.NoCommand;
             m_flashStatus = FlashStatus.DoinNuthin;
             m_thread = new Thread(run);
@@ -106,6 +124,40 @@ namespace T7Tool.Flasher
         }
 
         /// <summary>
+        /// This method starts a reading session for reading memory.
+        /// </summary>
+        /// <param name="a_fileName">Name of the file where the flash contents is saved.</param>
+        /// <param name="a_offset">Starting address to read from.</param>
+        /// <param name="a_length">Length to read.</param>
+        public void readMemory(string a_fileName, UInt32 a_offset, UInt32 a_length)
+        {
+            lock (m_synchObject)
+            {
+                m_command = FlashCommand.ReadMemoryCommand;
+                m_fileName = a_fileName;
+                m_offset = a_offset;
+                m_length = a_length;
+            }
+            m_resetEvent.Set();
+        }
+
+        /// <summary>
+        /// This method starts symbol map.
+        /// </summary>
+        /// <param name="a_fileName">Name of the file where the flash contents is saved.</param>
+        /// <param name="a_offset">Starting address to read from.</param>
+        /// <param name="a_length">Length to read.</param>
+        public void readSymbolMap(string a_fileName)
+        {
+            lock (m_synchObject)
+            {
+                m_command = FlashCommand.ReadSymbolMapCommand;
+                m_fileName = a_fileName;
+            }
+            m_resetEvent.Set();
+        }
+
+        /// <summary>
         /// This method starts writing to flash.
         /// </summary>
         /// <param name="a_fileName">The name of the file from where to read the data from.</param>
@@ -124,7 +176,7 @@ namespace T7Tool.Flasher
         /// or write and handles this command until it's completed, stopped or until there is 
         /// a failure.
         /// </summary>
-        private void run()
+        void run()
         {
             bool gotSequrityAccess = false;
             while (true)
@@ -180,7 +232,7 @@ namespace T7Tool.Flasher
                             m_nrOfRetries++;
                         }
 
-                        while (!m_kwpHandler.sendDataTransferRequest(out data))
+                        while (!m_kwpHandler.sendRequestDataByOffset(out data))
                         {
                             m_nrOfRetries++;
                         }
@@ -189,6 +241,80 @@ namespace T7Tool.Flasher
                     }
                     fileStream.Close();
                     m_kwpHandler.sendDataTransferExitRequest();
+                }
+                else if (m_command == FlashCommand.ReadMemoryCommand)
+                {
+                    int nrOfBytes = 64;
+                    byte[] data;
+
+                    if (File.Exists(m_fileName))
+                        File.Delete(m_fileName);
+                    FileStream fileStream = File.Create(m_fileName, 1024);
+                    int nrOfReads = (int)m_length / nrOfBytes;
+                    for (int i = 0; i < nrOfReads; i++)
+                    {
+                        lock (m_synchObject)
+                        {
+                            if (m_command == FlashCommand.StopCommand)
+                                continue;
+                            if (m_endThread)
+                                return;
+                        }
+                        m_flashStatus = FlashStatus.Reading;
+                        if (i == nrOfReads - 1)
+                            nrOfBytes = (int) m_length - nrOfBytes * i;
+                        while (!m_kwpHandler.sendReadRequest((uint)m_offset + (uint)(nrOfBytes * i), (uint)nrOfBytes))
+                        {
+                            m_nrOfRetries++;
+                        }
+
+                        while (!m_kwpHandler.sendRequestDataByOffset(out data))
+                        {
+                            m_nrOfRetries++;
+                        }
+                        fileStream.Write(data, 0, nrOfBytes);
+                        m_nrOfBytesRead += nrOfBytes;
+                    }
+                    fileStream.Close();
+                    m_kwpHandler.sendDataTransferExitRequest();
+                }
+                else if (m_command == FlashCommand.ReadSymbolMapCommand)
+                {
+                    byte[] data;
+                    string swVersion = "";
+                    m_nrOfBytesRead = 0;
+                    if (File.Exists(m_fileName))
+                        File.Delete(m_fileName);
+                    FileStream fileStream = File.Create(m_fileName, 1024);
+                    if(m_kwpHandler.sendUnknownRequest() != KWPResult.OK)
+                    {
+                        m_flashStatus = FlashStatus.ReadError;
+                        continue;
+                    }
+                    m_flashStatus = FlashStatus.Reading;
+                    m_kwpHandler.getSwVersionFromDR51(out swVersion);
+
+                    if (m_kwpHandler.sendReadSymbolMapRequest() != KWPResult.OK)
+                    {
+                        m_flashStatus = FlashStatus.ReadError;
+                        continue;
+                    }
+                    m_kwpHandler.sendDataTransferRequest(out data);
+                    while (data.Length > 0x10)
+                    {
+                        fileStream.Write(data, 1, data.Length - 3);
+                        m_nrOfBytesRead += data.Length - 3;
+                        lock (m_synchObject)
+                        {
+                            if (m_command == FlashCommand.StopCommand)
+                                continue;
+                            if (m_endThread)
+                                return;
+                        }
+                        m_kwpHandler.sendDataTransferRequest(out data);
+                    }
+                    fileStream.Flush();
+                    fileStream.Close();
                 }
                 else if (m_command == FlashCommand.WriteCommand)
                 {
@@ -268,10 +394,13 @@ namespace T7Tool.Flasher
         private FlashCommand m_command;
         private string m_fileName;
         private Object m_synchObject = new Object();
-        private KWPHandler m_kwpHandler;
+        private static KWPHandler m_kwpHandler;
         private int m_nrOfRetries;
         private FlashStatus m_flashStatus;
         private int m_nrOfBytesRead;
         private bool m_endThread = false;
+        private UInt32 m_offset;
+        private UInt32 m_length;
+        private static T7Flasher m_instance;
     }
 }
