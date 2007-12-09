@@ -114,5 +114,23 @@ namespace T7Tool.KWP
         /// </summary>
         /// <returns>Byte array representing the KWPRequest.</returns>
         public byte[] getData() { return m_request; }
+
+
+        override public String ToString()
+        {
+            if (m_request.Length == 0)
+                return "Empty reply";
+            StringBuilder hex = new StringBuilder();
+            hex.Append("Request: ");
+            for (int i = 0; i < m_request[0]+1; i++)
+            {
+                if (m_request[i] < 10)
+                    hex.Append("0");
+                hex.Append(Convert.ToString(m_request[i], 16));
+                hex.Append(",");
+            }
+            hex.Remove(hex.Length - 1, 1);
+            return hex.ToString();
+        }
     }
 }

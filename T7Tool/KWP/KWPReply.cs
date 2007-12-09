@@ -120,5 +120,22 @@ namespace T7Tool.KWP
                 data[j] = m_reply[i];
             return data;
         }
+
+        override public String ToString()
+        {
+            if(m_reply.Length == 0)
+                return "Empty reply";
+            StringBuilder hex = new StringBuilder();
+            hex.Append("Reply:   ");
+            for (int i = 0; i < m_reply[0]+1; i++)
+            {
+                if (m_reply[i] < 10)
+                    hex.Append("0");
+                hex.Append(Convert.ToString(m_reply[i], 16));
+                hex.Append(",");
+            }
+            hex.Remove(hex.Length - 1, 1);
+            return hex.ToString();
+        }
     }
 }
