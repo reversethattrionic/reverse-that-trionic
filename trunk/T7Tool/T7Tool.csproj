@@ -81,6 +81,7 @@
     <Compile Include="Forms\InfoFormStatic.Designer.cs">
       <DependentUpon>InfoFormStatic.cs</DependentUpon>
     </Compile>
+    <Compile Include="KWP\ELM327Device.cs" />
     <Compile Include="Parser\Symbol.cs" />
     <Compile Include="Parser\SymbolMapParser.cs" />
     <Compile Include="Parser\T7FileParser.cs" />

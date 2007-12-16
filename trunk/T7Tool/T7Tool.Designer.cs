@@ -141,7 +141,7 @@ namespace T7Tool
             // eCUToolStripMenuItem
             // 
             this.eCUToolStripMenuItem.Name = "eCUToolStripMenuItem";
-            this.eCUToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.eCUToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
             this.eCUToolStripMenuItem.Text = "ECU";
             this.eCUToolStripMenuItem.Click += new System.EventHandler(this.eCUToolStripMenuItem_Click);
             // 
@@ -730,11 +730,13 @@ namespace T7Tool
             // 
             this.kwpDeviceComboBox.FormattingEnabled = true;
             this.kwpDeviceComboBox.Items.AddRange(new object[] {
-            "Lawicel CANUSB"});
+            "Lawicel CANUSB",
+            "ELM327 1.2"});
             this.kwpDeviceComboBox.Location = new System.Drawing.Point(17, 27);
             this.kwpDeviceComboBox.Name = "kwpDeviceComboBox";
             this.kwpDeviceComboBox.Size = new System.Drawing.Size(121, 21);
             this.kwpDeviceComboBox.TabIndex = 0;
+            this.kwpDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.kwpDeviceComboBox_SelectedIndexChanged);
             // 
             // openFileDialog
             // 
