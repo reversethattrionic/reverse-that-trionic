@@ -19,6 +19,7 @@ namespace T7Tool
         private Forms.RealTimeSymbolForm realTimeSymbolForm;
         private T7FileHeader t7InfoHeader = null;
         private CANUSBDevice canUsbDevice = null;
+        private ELM327Device m_elm327Device = null;
         private KWPCANDevice kwpCanDevice = null;
         private KWPHandler kwpHandler = null;
         private T7Flasher m_t7Flasher = null;
@@ -265,10 +266,20 @@ namespace T7Tool
             {
                 kwpCanDevice.setCANDevice(canUsbDevice);
                 KWPHandler.setKWPDevice(kwpCanDevice);
-                kwpHandler = KWPHandler.getInstance();
-                T7Flasher.setKWPHandler(kwpHandler);
-                m_t7Flasher = T7Flasher.getInstance();
+                
             }
+            else if (kwpDeviceComboBox.SelectedItem.ToString() == "ELM327 1.2")
+            {
+                if (m_elm327Device == null)
+                    m_elm327Device = new ELM327Device();
+                KWPHandler.setKWPDevice(m_elm327Device);
+
+            }
+
+            kwpHandler = KWPHandler.getInstance();
+            T7Flasher.setKWPHandler(kwpHandler);
+            m_t7Flasher = T7Flasher.getInstance();
+
             if (kwpHandler.openDevice())
                 kwpDeviceConnectionStatus.Text = "Open";
             else
@@ -427,6 +438,11 @@ namespace T7Tool
             if(realTimeSymbolForm == null)
                 realTimeSymbolForm = new RealTimeSymbolForm();
             realTimeSymbolForm.Show();
+        }
+
+        private void kwpDeviceComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
     }
