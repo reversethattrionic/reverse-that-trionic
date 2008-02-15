@@ -13,6 +13,7 @@ namespace T5CANLib.CAN
         private CANMessage m_canMessage = new CANMessage();
         private uint m_waitMsgID = 0;
         private AutoResetEvent m_resetEvent = new AutoResetEvent(false);
+        private ICANDevice m_canDevice = null;
 
         public void setWaitMessageID(uint a_canID)
         {
@@ -22,15 +23,24 @@ namespace T5CANLib.CAN
             }
         }
 
-
-        public CANMessage waitForMessage(uint a_canID, int a_timeout)
+        public void setCANDevice(ICANDevice a_canDevice)
         {
+            lock (m_canMessage)
+            {
+                m_canDevice = a_canDevice;
+            }
+        }
+
+        public CANMessage waitForMessage(uint a_canID, int a_timeout, out bool r_timeout)
+        {
+            r_timeout = false;
             CANMessage retMsg;
             lock (m_canMessage)
             {
                 m_waitMsgID = a_canID;
             }
-            m_resetEvent.WaitOne(a_timeout, true);
+            if(!m_resetEvent.WaitOne(a_timeout, true))
+                r_timeout = true; 
             lock (m_canMessage)
             {
                 retMsg = m_canMessage;
@@ -51,6 +61,7 @@ namespace T5CANLib.CAN
                     m_canMessage.setLength(a_message.getLength());
                     m_canMessage.setTimeStamp(a_message.getTimeStamp());
                     m_resetEvent.Set();
+                    sendAck();
                 }
                 else
                 {
@@ -61,6 +72,16 @@ namespace T5CANLib.CAN
                     m_canMessage.setTimeStamp(0);
                 }
             }
+        }
+
+        private void sendAck()
+        {
+            if (m_canDevice == null)
+                throw new Exception("CAN device not set");
+            CANMessage ack = new CANMessage(0x006, 0, 2);
+            ack.setData(0x00000000000000C6);
+            if (!m_canDevice.sendMessage(ack))
+                throw new Exception("Couldn't send message");
         }
     }
 }
