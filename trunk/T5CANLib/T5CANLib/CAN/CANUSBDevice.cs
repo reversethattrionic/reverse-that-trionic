@@ -56,7 +56,7 @@ namespace T5CANLib.CAN
                         return;
                 }
                 readResult = LAWICEL.canusb_Read(m_deviceHandle, out r_canMsg);
-                if (readResult == LAWICEL.ERROR_CANUSB_OK)
+                if (readResult > 0)
                 {
                     canMessage.setID(r_canMsg.id);
                     canMessage.setLength(r_canMsg.len);
@@ -94,14 +94,18 @@ namespace T5CANLib.CAN
                 LAWICEL.CANUSB_ACCEPTANCE_CODE_ALL,
                 LAWICEL.CANUSB_ACCEPTANCE_MASK_ALL,
                 LAWICEL.CANUSB_FLAG_TIMESTAMP);
-            if (boxIsThere())
+
+            if (m_deviceHandle > 0)
             {
                 if (m_readThread.ThreadState == ThreadState.Unstarted)
                     m_readThread.Start();
                 return OpenResult.OK;
             }
-            close();
-            return OpenResult.OpenError;
+            else
+            {
+                close();
+                return OpenResult.OpenError;
+            }
         }
 
         /// <summary>
@@ -214,32 +218,7 @@ namespace T5CANLib.CAN
             return 0;
         }
 
-        /// <summary>
-        /// Check if there is connection with a CAN bus.
-        /// </summary>
-        /// <returns>true on connection, otherwise false</returns>
-        private bool boxIsThere()
-        {
-            return true;
-            CANMessage request = new CANMessage(0x005, 0, 8);
-            LAWICEL.CANMsg response = new LAWICEL.CANMsg();
-            CANMessage ack = new CANMessage(0x006, 0, 2);
-            request.setData(0xFFFFFFFFFFFF0DC4);
-            ack.setData(0x00000000000000C6);
-            if (!sendMessage(request))
-                return false;
-            if (waitForMessage(0x00C, 1000, out response) == 0x00C)
-            {
-                if (response.data == 0x00000000003E00C6)
-                {
-                    sendMessage(ack);
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }
-       
+      
     }
 
 

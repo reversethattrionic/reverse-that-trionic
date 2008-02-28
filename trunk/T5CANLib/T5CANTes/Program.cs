@@ -20,9 +20,15 @@ namespace T5CANTest
                 System.Console.WriteLine("Could not open CAN device");
                 return;
             }
+      /*      if(!t5can.initialize())
+            {
+                System.Console.WriteLine("Could not initialize");
+                return;
+            }
+            swVersion = t5can.getSWVersion();*/
             System.Console.WriteLine("SW version: " + swVersion);
             System.Console.WriteLine();
-            //t5can.getSymbolTable(out symbolTable);
+           // t5can.getSymbolTable(out symbolTable);
 
             Environment.Exit(0);
         }

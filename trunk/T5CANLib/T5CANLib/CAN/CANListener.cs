@@ -10,14 +10,14 @@ namespace T5CANLib.CAN
     /// </summary>
     class CANListener : ICANListener
     {
-        private CANMessage m_canMessage = new CANMessage();
+        private Queue<CANMessage> m_msgQueue = new Queue<CANMessage>();
         private uint m_waitMsgID = 0;
         private AutoResetEvent m_resetEvent = new AutoResetEvent(false);
         private ICANDevice m_canDevice = null;
 
         public void setWaitMessageID(uint a_canID)
         {
-            lock (m_canMessage)
+            lock (m_msgQueue)
             {
                 m_waitMsgID = a_canID;
             }
@@ -25,7 +25,7 @@ namespace T5CANLib.CAN
 
         public void setCANDevice(ICANDevice a_canDevice)
         {
-            lock (m_canMessage)
+            lock (m_msgQueue)
             {
                 m_canDevice = a_canDevice;
             }
@@ -34,54 +34,43 @@ namespace T5CANLib.CAN
         public CANMessage waitForMessage(uint a_canID, int a_timeout, out bool r_timeout)
         {
             r_timeout = false;
-            CANMessage retMsg;
-            lock (m_canMessage)
+            CANMessage retMsg = new CANMessage();
+            if (!m_resetEvent.WaitOne(a_timeout, true))
             {
-                m_waitMsgID = a_canID;
+                r_timeout = true;
+                return retMsg;
             }
-            if(!m_resetEvent.WaitOne(a_timeout, true))
-                r_timeout = true; 
-            lock (m_canMessage)
+            lock (m_msgQueue)
             {
-                retMsg = m_canMessage;
+                retMsg = m_msgQueue.Dequeue(); 
             }
-
+            
             return retMsg;
-        }
-
-        override public void handleMessage(CANMessage a_message)
-        {
-            lock (m_canMessage)
-            {
-                if (a_message.getID() == m_waitMsgID)
-                {
-                    m_canMessage.setData(a_message.getData());
-                    m_canMessage.setFlags(a_message.getFlags());
-                    m_canMessage.setID(a_message.getID());
-                    m_canMessage.setLength(a_message.getLength());
-                    m_canMessage.setTimeStamp(a_message.getTimeStamp());
-                    m_resetEvent.Set();
-                    sendAck();
-                }
-                else
-                {
-                    m_canMessage.setData(0);
-                    m_canMessage.setFlags(0);
-                    m_canMessage.setID(0);
-                    m_canMessage.setLength(0);
-                    m_canMessage.setTimeStamp(0);
-                }
-            }
         }
 
         private void sendAck()
         {
-            if (m_canDevice == null)
-                throw new Exception("CAN device not set");
             CANMessage ack = new CANMessage(0x006, 0, 2);
             ack.setData(0x00000000000000C6);
             if (!m_canDevice.sendMessage(ack))
                 throw new Exception("Couldn't send message");
         }
+
+        override public void handleMessage(CANMessage a_message)
+        {
+            CANMessage canMessage = new CANMessage();
+            lock (m_msgQueue)
+            {
+                canMessage.setData(a_message.getData());
+                canMessage.setFlags(a_message.getFlags());
+                canMessage.setID(a_message.getID());
+                canMessage.setLength(a_message.getLength());
+                canMessage.setTimeStamp(a_message.getTimeStamp());
+                m_msgQueue.Enqueue(canMessage);
+                m_resetEvent.Set();
+              //  sendAck();
+            }
+        }
+
     }
 }
